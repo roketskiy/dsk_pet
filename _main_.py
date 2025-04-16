@@ -9,6 +9,8 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QLabel,QMenu, QAction,  QMes
 
 from PetDataHandler import PetDataHandler
 from PsychChatWindow import PsychChatWindow
+from WeatherWindow import WeatherWindow
+
 
 # ==================== 桌宠主程序 ====================
 class DesktopPet(QWidget):
@@ -23,9 +25,17 @@ class DesktopPet(QWidget):
         self.dragging = False
 
         self.chat_window = None
-        self.game = None
 
-        self.weather =None
+        self.weather_window = None
+
+
+        self.weather_label = QLabel(self)
+        self.weather_label.setPixmap(QPixmap("img/天气-未知.png"))
+        self.weather_label.setFixedSize(40, 40)
+        self.weather_label.move(0, 0)
+        self.weather_label.setAttribute(Qt.WA_TranslucentBackground)
+        self.weather_label.setStyleSheet("border: none;")
+
 
         self.data_handler = PetDataHandler()
         self.session_id = self.data_handler.start_session()
@@ -36,7 +46,7 @@ class DesktopPet(QWidget):
 
         self.click_timer = QTimer()
         self.click_timer.setSingleShot(True)
-        self.click_timer.timeout.connect(self.handle_successful_click)
+
 
         # 右键菜单
         self.menu = QMenu(self)
@@ -47,7 +57,7 @@ class DesktopPet(QWidget):
                 background-color: white;  /* 背景颜色为白色 */
                 color:black;  /* 字体颜色为白色 */
                 border-radius: 8px;  /* 圆角 */
-                border: 1px solid #444;  /* 边框颜色 */
+                border: 1px solid black;  /* 边框 */
                 padding: 0;
             }
             QMenu::item {
@@ -71,43 +81,44 @@ class DesktopPet(QWidget):
             }
         """)
         self.menu.update()
+        self.menu.addSeparator()
         self.chat_action = QAction("和小忆说说话", self)
         self.chat_action.triggered.connect(self.show_chat_window)
         self.menu.addAction(self.chat_action)
         self.menu.addSeparator()
+        self.weather_action = QAction("查看天气", self)
+        self.weather_action.triggered.connect(self.show_weather_window)
+        self.menu.addAction(self.weather_action)
+        self.menu.addSeparator()
         self.game_action = QAction("玩玩小游戏", self)
-        self.game_action.triggered.connect(self.random_appear_game)
+
         self.menu.addAction(self.game_action)
         self.menu.addSeparator()
         self.exit_action = QAction("退出", self)
         self.exit_action.triggered.connect(self.close)
         self.menu.addAction(self.exit_action)
-
-        self.weather_label = QLabel(self)
-        self.weather_label.setPixmap(QPixmap("img/天气-未知.png"))  # 替换为你的图片路径
-        self.weather_label.setFixedSize(32, 32)
-        self.weather_label.move(0, 0)
-        self.weather_label.setAttribute(Qt.WA_TranslucentBackground)
-        self.weather_label.setStyleSheet("border: none;")
-
-        self.weather_update()
+        self.menu.addSeparator()
 
 
 
     def init_ui(self):
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setGeometry(1200, 800, 150, 150)
+        self.setGeometry(1200, 800, 180, 180)
+        self.update_weather_icon()
 
 
     def closeEvent(self, event):
         if self.chat_window:
             self.chat_window.close()
+        if self.weather_window:
+            self.weather_window.close()
         self.data_handler.end_session()
         event.accept()
 
     def init_animation(self):
         self.animation_label = QLabel(self)
+        self.animation_label.move(10,10)
         self.animations = ["img/stand.gif", "img/walk.gif", "img/sleep.gif"]
         self.current_animation = None
         self.random_action()
@@ -158,126 +169,20 @@ class DesktopPet(QWidget):
 
     def show_chat_window(self):
         if not self.chat_window:
-            self.chat_window = PsychChatWindow()
-        pet_pos = self.pos()
-        pet_width = self.width()
-        chat_x = pet_pos.x() + pet_width + 10  # 右边留 10px 间距
-        chat_y = pet_pos.y()
-        self.chat_window.move(chat_x, chat_y)
+            self.chat_window = PsychChatWindow(self)  # 传递self作为父窗口
         self.chat_window.show()
 
-    def weather_update(self):
-        url = "https://restapi.amap.com/v3/weather/weatherInfo"
+    def update_weather_icon(self):
+        """更新天气图标"""
+        if not self.weather_window:
+            self.weather_window = WeatherWindow(self)
+        self.weather_label.setPixmap(QPixmap(self.weather_window.get_current_weather_icon()))
 
-        # 请求参数
-        params = {
-            "city": "110101",
-            "key": "4eb3b110f994aa8aae247ec92a7358ea"  # 替换为你的城市key
-        }
-
-        # 发送GET请求
-        weather_response = requests.get(url,params)
-
-        # 解析返回的JSON数据
-        weather_data = weather_response.json()
-
-        if weather_data["status"] == "1":
-            self.weather_current = weather_data["lives"][0]["weather"]
-            print(self.weather_current)
-            if self.weather_current == "晴":
-                self.weather_label.setPixmap(QPixmap("img/烈日.png"))
-            elif self.weather_current in ["阴","少云","晴间多云"," 多云"]:
-                self.weather_label.setPixmap(QPixmap("img/多云.png"))
-            elif self.weather_current in ["沙尘暴","浮尘","扬沙","强沙尘暴"]:
-                self.weather_label.setPixmap(QPixmap("img/沙尘.png"))
-            elif self.weather_current in ["雪", "阵雪", "小雪", "中雪", "大雪", "暴雪"]:
-                self.weather_label.setPixmap(QPixmap("img/大雪.png"))
-            elif self.weather_current in ["阵雨","细雨","小雨", "中雨", "大雨", "暴雨", "大暴雨", "特大暴雨"]:
-                self.weather_label.setPixmap(QPixmap("img/雨天.png"))
-            elif self.weather_current in ["雷阵雨", "雷阵雨伴有冰雹"]:
-                self.weather_label.setPixmap(QPixmap("img/雷电.png"))
-            elif self.weather_current in ["有风","平静微风","和风","清风","强风","劲风","疾风","大风","烈风","风暴","狂爆风","飓风","热带风"]:
-                self.weather_label.setPixmap(QPixmap("img/风.png"))
-            elif self.weather_current in ["霾","中度霾","重度霾","严重霾","雾","浓雾","强浓雾","轻雾","大雾","特强浓雾"]:
-                self.weather_label.setPixmap(QPixmap("img/雾霾.png"))
-            else:
-                self.weather_label.setPixmap(QPixmap("img/天气-未知.png"))
-
-
-        else:
-            self.weather_label.setPixmap(QPixmap("img/天气-未知.png"))
-
-    def handle_successful_click(self):
-        pass
-    def random_appear_game(self):
-        pass
-
-class PetGame_random_appear():
-    def __init__(self, pet):
-        self.pet = pet
-        self.score = 0
-        self.time_left = 30
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_timer)
-
-        # 分数显示标签
-        self.score_label = QLabel(pet)
-        self.score_label.setStyleSheet("""
-            QLabel {
-                color: white;
-                font-size: 16px;
-                font-weight: bold;
-                background: rgba(0,0,0,0.5);
-                padding: 5px;
-                border-radius: 10px;
-            }
-        """)
-        self.score_label.move(10, 10)
-        self.update_score()
-
-        # 倒计时标签
-        self.time_label = QLabel(pet)
-        self.time_label.setStyleSheet(self.score_label.styleSheet())
-        self.time_label.move(pet.width() - 100, 10)
-        self.update_time()
-
-    def update_score(self):
-        self.score_label.setText(f"得分: {self.score}")
-        self.score_label.adjustSize()
-
-    def update_time(self):
-        self.time_label.setText(f"剩余: {self.time_left}s")
-        self.time_label.adjustSize()
-
-    def update_timer(self):
-        self.time_left -= 1
-        self.update_time()
-        if self.time_left <= 0:
-            self.timer.stop()
-            QMessageBox.information(self.pet, "游戏结束", f"最终得分: {self.score}")
-
-    def start_game(self):
-        self.score = 0
-        self.time_left = 30
-        self.update_score()
-        self.update_time()
-        self.timer.start(3000)  # 每秒更新
-        self.move_pet_randomly()
-
-    def move_pet_randomly(self):
-        # 获取屏幕可用区域
-        screen_rect = QApplication.primaryScreen().availableGeometry()
-
-        # 随机位置（确保完全可见）
-        new_x = random.randint(0, screen_rect.width() - self.pet.width())
-        new_y = random.randint(0, screen_rect.height() - self.pet.height())
-
-        self.pet.move(new_x, new_y)
-
-        # 2秒后再次移动（如果游戏未结束）
-        if self.time_left > 0:
-            QTimer.singleShot(2000, self.move_pet_randomly)
-
+    def show_weather_window(self):
+        """显示天气详情窗口"""
+        if not self.weather_window:
+            self.weather_window = WeatherWindow(self)
+        self.weather_window.weather_show()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

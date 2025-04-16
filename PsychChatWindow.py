@@ -1,8 +1,8 @@
 import requests
-from PyQt5.QtCore import QThread, pyqtSignal, Qt, QTimer
-from PyQt5.QtGui import QColor, QIcon, QPixmap
-from PyQt5.QtWidgets import QWidget, QGraphicsDropShadowEffect, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, \
-    QScrollArea, QLineEdit
+from PyQt5.QtCore import QThread, pyqtSignal, Qt, QTimer, QSize
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtWidgets import QWidget,  QVBoxLayout, QHBoxLayout, QLabel, QPushButton, \
+    QScrollArea, QLineEdit, QApplication
 
 from PetDataHandler import PetDataHandler
 
@@ -68,26 +68,31 @@ class ChatWorker(QThread):
 
 
 class PsychChatWindow(QWidget):
-    def __init__(self):
+    def __init__(self,parent_pet=None):
         super().__init__()
-
+        self.send_btn = None
+        self.input_box = None
+        self.drag_pos = None
+        self.worker = None
+        self.chat_container = None
+        self.chat_layout = None
+        self.parent_pet = parent_pet
         # 添加窗口图标设置
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setStyleSheet(
+            """background-color: transparent;"""
+        )
         self.setWindowTitle('小忆')
         self.setFixedSize(380, 500)  # 固定窗口大小
 
-        self.shadow = QGraphicsDropShadowEffect(self)
-        self.shadow.setBlurRadius(20)
-        self.shadow.setColor(QColor(0, 0, 0, 150))
-        self.shadow.setOffset(0, 0)
+
 
 
         self.data_handler = PetDataHandler()
 
         self.main_container = QWidget(self)
         self.main_container.setObjectName("mainContainer")
-        self.main_container.setGraphicsEffect(self.shadow)
         self.main_container.setStyleSheet("""
                     #mainContainer {
                         background: #ffffff;
@@ -146,94 +151,79 @@ class PsychChatWindow(QWidget):
 
     def init_ui(self):
 
-        self.setWindowTitle('小忆')
-        self.setGeometry(200, 200, 450, 600)
+        main_layout = QVBoxLayout(self.main_container)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
 
-        self.setStyleSheet("""
-            QWidget {
-                background: #B0E2FF;
-                font-family: 'Microsoft YaHei';
-               
-            }
-            QTextEdit {
-                background: transparent;
-                border: none;
-                padding: 10px;
-                font-size: 14px;
-            }
-            QLineEdit {
-                background: white;
-                border: 1px solid #ddd;
-                padding: 8px 15px;
-                font-size: 14px;
-                margin: 5px;
-            }
-            QPushButton {
-                background: #4ab19d;
-                color: white;
-                border: none;
-                padding: 8px 20px;
-                font-size: 14px;
-                min-width: 80px;
-            }
-            QPushButton:hover {
-                background: #3a9a8a;
-            }
-            QPushButton:disabled {
-                background: #cccccc;
-            }
-        """)
-        title_bar = QWidget(self.main_container)
-        title_bar.setFixedHeight(40)
+        # 标题栏
+        title_bar = QWidget()
+        title_bar.setFixedHeight(50)
         title_bar.setStyleSheet("""
-                    background: #4ab19d;
-                    border-top-left-radius: 12px;
-                    border-top-right-radius: 12px;
+                    background: rgba(204,229,255,0.3);
+                    border-top-left-radius: 15px;
+                    border-top-right-radius: 15px;
+                    padding-left: 15px;
                 """)
 
-        # 标题栏布局
-
-        layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-
-        # 添加标题栏
-        title_bar = QWidget()
-        title_bar.setStyleSheet("background: #40C4FF; padding: 8px;")
         title_layout = QHBoxLayout(title_bar)
+        title_layout.setContentsMargins(0, 0, 10, 0)
 
-        self.icon_label = QLabel()
-        self.icon_label.setPixmap(
-            QPixmap('img/chat_icon.png').scaled(24, 24, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-        title_layout.addWidget(self.icon_label)
+        # 标题图标和文字
+        title_icon = QLabel()
+        title_icon.setPixmap(QPixmap('img/chat_icon.png').scaled(30, 30, Qt.KeepAspectRatio, Qt.SmoothTransformation))
 
-        close_btn = QPushButton("exit")
-        close_btn.setFixedSize(36, 36)
+        title_text = QLabel("小忆")
+        title_text.setStyleSheet("""
+                    QLabel {
+                        color: black;
+                        font-size: 16px;
+                        font-weight: bold;
+                        padding-left: 10px;
+                        font-family: 'Microsoft YaHei';
+                    }
+                """)
+
+        # 关闭按钮
+        close_btn = QPushButton()
+        close_btn.setIcon(QIcon('img/close_icon.png'))
+        close_btn.setIconSize(QSize(32, 32))
+
         close_btn.setStyleSheet("""
                     QPushButton {
-                        color: white;
-                        font-size: 18px;
-                        border: none;
                         background: transparent;
+                        border: none;
+                        border-radius: 15px;
                     }
                     QPushButton:hover {
-                        background: rgba(25, 121, 205, 0.1);
-                        border-radius: 12px;
+                        background: rgba(255, 255, 255, 0.1);
                     }
                 """)
         close_btn.clicked.connect(self.close)
 
-        title_label = QLabel("小忆")
-        title_label.setStyleSheet("color: white; font-weight: bold; font-size: 16px;")
-        title_layout.addWidget(title_label)
+        title_layout.addWidget(title_icon)
+        title_layout.addWidget(title_text)
         title_layout.addStretch()
         title_layout.addWidget(close_btn)
 
-        layout.addWidget(title_bar)
+        main_layout.addWidget(title_bar)
 
-        # 聊天区域使用QScrollArea实现更好的滚动效果
-        scroll_area = QScrollArea()
-        scroll_area.setWidgetResizable(True)
+        # 聊天区域
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setStyleSheet("""
+                    QScrollArea {
+                        border: none;
+                        background: #f5f5f5;
+                    }
+                    QScrollBar:vertical {
+                        width: 8px;
+                        background: #f5f5f5;
+                    }
+                    QScrollBar::handle:vertical {
+                        background: #d0d0d0;
+                        border-radius: 4px;
+                    }
+                """)
 
         self.chat_container = QWidget()
         self.chat_layout = QVBoxLayout(self.chat_container)
@@ -241,42 +231,96 @@ class PsychChatWindow(QWidget):
         self.chat_layout.setSpacing(12)
         self.chat_layout.addStretch()
 
-        scroll_area.setWidget(self.chat_container)
-        layout.addWidget(scroll_area, 1)
+        self.scroll_area.setWidget(self.chat_container)
+        main_layout.addWidget(self.scroll_area, 1)
 
         # 输入区域
         input_widget = QWidget()
-        input_widget.setStyleSheet("background: white; border-top: 1px solid #e0e0e0;")
+        input_widget.setStyleSheet("""
+                    background: white;
+                    border-top: 1px solid #e0e0e0;
+                    border-bottom-left-radius: 15px;
+                    border-bottom-right-radius: 15px;
+                """)
+
         input_layout = QHBoxLayout(input_widget)
-        input_layout.setContentsMargins(10, 10, 10, 10)
+        input_layout.setContentsMargins(15, 15, 15, 15)
 
         self.input_box = QLineEdit()
         self.input_box.setPlaceholderText("输入你的想法...")
+        self.input_box.setStyleSheet("""
+                    QLineEdit {
+                        background: white;
+                        border: 1px solid #e0e0e0;
+                        border-radius: 18px;
+                        padding: 8px 15px;
+                        font-size: 14px;
+                        font-family: 'Microsoft YaHei';
+                    }
+                """)
         self.input_box.returnPressed.connect(self.send_message)
 
-        self.send_btn = QPushButton("发送")
+        self.send_btn = QPushButton()
+        self.send_btn.setIcon(QIcon('img/send_icon.png'))
+        self.send_btn.setIconSize(QSize(32, 32))
+        self.send_btn.setFixedSize(40, 40)
         self.send_btn.setStyleSheet("""
-            QPushButton {
-                background: #4ab19d;
-                color: white;
-                border: none;
-                border-radius: 15px;
-                padding: 8px;
-                min-width: 80px;
-            }
-            QPushButton:hover { background: #3a9a8a; }
-            QPushButton:disabled { background: #cccccc; }
-        """)
+                    QPushButton {
+                        background: white;
+                        border: none;
+                        border-radius: 20px;
+                    }
+                    QPushButton:hover {
+                        background: rgba(224,224,224, 0.3);
+                    }
+                    QPushButton:disabled {
+                        background: rgba(32,32,32, 0.4);
+                    }
+                """)
         self.send_btn.clicked.connect(self.send_message)
 
         input_layout.addWidget(self.input_box, 1)
         input_layout.addWidget(self.send_btn, 0, Qt.AlignRight)
-        layout.addWidget(input_widget)
+        main_layout.addWidget(input_widget)
 
-        self.setLayout(layout)
+        # 窗口拖动功能
+        self.drag_pos = None
+        title_bar.mousePressEvent = self.title_mouse_press
+        title_bar.mouseMoveEvent = self.title_mouse_move
 
         # 初始化显示欢迎消息
         self.add_message("assistant", self.messages[1]["content"])
+
+    def title_mouse_press(self, event):
+        if event.button() == Qt.LeftButton:
+            self.drag_pos = event.globalPos()
+
+    def title_mouse_move(self, event):
+        if self.drag_pos and event.buttons() == Qt.LeftButton:
+            self.move(self.pos() + event.globalPos() - self.drag_pos)
+            self.drag_pos = event.globalPos()
+
+    def show(self):
+        super().show()
+        self.adjust_position()
+
+    def adjust_position(self):
+        if not self.parent_pet:
+            return
+
+        # 获取桌宠位置和屏幕信息
+        pet_pos = self.parent_pet.pos()
+        pet_width = self.parent_pet.width()
+        screen_rect = QApplication.primaryScreen().availableGeometry()
+
+        # 尝试放在右侧
+        right_x = pet_pos.x() + pet_width + 10
+        if right_x + self.width() <= screen_rect.right():
+            self.move(right_x, pet_pos.y())
+        # 右侧空间不足则放在左侧
+        else:
+            left_x = pet_pos.x() - self.width() - 10
+            self.move(left_x, pet_pos.y())
 
     def add_message(self, role, content):
         """添加带气泡效果的消息"""
@@ -309,6 +353,7 @@ class PsychChatWindow(QWidget):
                 padding: 12px;
                 font-size: 14px;
                 max-width: 280px;
+                font-family: 'Microsoft YaHei';
             }
         """ % (
             "#e3f2fd" if role == "assistant" else "#4ab19d",
@@ -325,7 +370,7 @@ class PsychChatWindow(QWidget):
 
         self.chat_layout.insertWidget(0, message_widget)
 
-        # 自动滚动到底部
+        # 自动滚动到顶部
         QTimer.singleShot(100, lambda: self._scroll_to_top())
 
     def send_message(self):
