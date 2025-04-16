@@ -74,8 +74,10 @@ class PsychChatWindow(QWidget):
         # 添加窗口图标设置
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
-        self.shadow = QGraphicsDropShadowEffect(self)
+        self.setWindowTitle('小忆')
+        self.setFixedSize(380, 500)  # 固定窗口大小
 
+        self.shadow = QGraphicsDropShadowEffect(self)
         self.shadow.setBlurRadius(20)
         self.shadow.setColor(QColor(0, 0, 0, 150))
         self.shadow.setOffset(0, 0)
@@ -83,16 +85,18 @@ class PsychChatWindow(QWidget):
 
         self.data_handler = PetDataHandler()
 
-
         self.main_container = QWidget(self)
         self.main_container.setObjectName("mainContainer")
         self.main_container.setGraphicsEffect(self.shadow)
         self.main_container.setStyleSheet("""
                     #mainContainer {
                         background: #ffffff;
-                        border-radius: 12px;
+                        border-radius: 15px;
+                        border: 1px solid #e0e0e0;
                     }
                 """)
+        self.main_container.setGeometry(0, 0, 380, 500)
+
 
         self.scroll_area = None
         self.setWindowIcon(QIcon('img/chat_icon.png'))  # 请准备32x32像素的ICO/PNG图标
@@ -149,7 +153,7 @@ class PsychChatWindow(QWidget):
             QWidget {
                 background: #B0E2FF;
                 font-family: 'Microsoft YaHei';
-                border-radius: 2px;
+               
             }
             QTextEdit {
                 background: transparent;
@@ -160,7 +164,6 @@ class PsychChatWindow(QWidget):
             QLineEdit {
                 background: white;
                 border: 1px solid #ddd;
-                border-radius: 18px;
                 padding: 8px 15px;
                 font-size: 14px;
                 margin: 5px;
@@ -169,7 +172,6 @@ class PsychChatWindow(QWidget):
                 background: #4ab19d;
                 color: white;
                 border: none;
-                border-radius: 18px;
                 padding: 8px 20px;
                 font-size: 14px;
                 min-width: 80px;
