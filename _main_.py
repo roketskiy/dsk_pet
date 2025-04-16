@@ -119,22 +119,9 @@ class DesktopPet(QWidget):
         self.chat_window.move(chat_x, chat_y)
         self.chat_window.show()
 
-    def handle_successful_click(self):
-        """点击成功处理"""
-        self.game.score += 1
-        self.game.update_score()
-        self.data_handler.log_game_score(1)
 
-        # 点击反馈动画
-        self.play_animation("img/happy.gif")
-        QTimer.singleShot(1000, lambda: self.play_animation("img/stand.gif"))
 
-        # 立即移动到新位置增加游戏性
-        if hasattr(self, 'game'):
-            self.game.move_pet_randomly()
 
-    def random_appear_game(self):
-        self.game = PetGame_random_appear(self)
 
 
 class PetGame_random_appear():
