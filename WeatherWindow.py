@@ -49,7 +49,7 @@ class WeatherWindow(QWidget):
         title_bar.setFixedHeight(50)
         # 设置标题栏的样式表，包括背景色、圆角和内边距
         title_bar.setStyleSheet("""
-                            background: white;
+                            background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #ADD8E6, stop:1 #FFFFFF);
                             border-top-left-radius: 15px;
                             border-top-right-radius: 15px;
                             padding-left: 15px;
@@ -63,10 +63,16 @@ class WeatherWindow(QWidget):
         # 天气图标和基本信息
         title_icon = QLabel()
         title_icon.setPixmap(QPixmap('img/天气.png').scaled(48, 48, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        title_icon.setStyleSheet("""
+                                    background: transparent;
+
+                                """)
+
 
         title_text = QLabel("天气详情")
         title_text.setStyleSheet("""
                             QLabel {
+                                background: transparent;
                                 color: black;
                                 font-size: 16px;
                                 font-weight: bold;
@@ -125,6 +131,21 @@ class WeatherWindow(QWidget):
         main_layout.addWidget(mid_body)
 
         self.update_weather()
+
+        self.drag_pos = None
+        title_bar.mousePressEvent = self.title_mouse_press
+        title_bar.mouseMoveEvent = self.title_mouse_move
+
+
+    def title_mouse_press(self, event):
+        if event.button() == Qt.LeftButton:
+            self.drag_pos = event.globalPos()
+
+    def title_mouse_move(self, event):
+        if self.drag_pos and event.buttons() == Qt.LeftButton:
+            self.move(self.pos() + event.globalPos() - self.drag_pos)
+            self.drag_pos = event.globalPos()
+
 
     def adjust_position(self):
         if not self.parent:

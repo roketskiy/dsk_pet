@@ -159,7 +159,7 @@ class PsychChatWindow(QWidget):
         title_bar = QWidget()
         title_bar.setFixedHeight(50)
         title_bar.setStyleSheet("""
-                    background: rgba(204,229,255,0.3);
+                    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #ADD8E6, stop:1 #FFFFFF);
                     border-top-left-radius: 15px;
                     border-top-right-radius: 15px;
                     padding-left: 15px;
@@ -171,10 +171,16 @@ class PsychChatWindow(QWidget):
         # 标题图标和文字
         title_icon = QLabel()
         title_icon.setPixmap(QPixmap('img/chat_icon.png').scaled(30, 30, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        title_icon.setStyleSheet("""
+                            background: transparent;
+                        
+                        """)
+
 
         title_text = QLabel("小忆")
         title_text.setStyleSheet("""
                     QLabel {
+                        background: transparent;
                         color: black;
                         font-size: 16px;
                         font-weight: bold;
@@ -184,26 +190,26 @@ class PsychChatWindow(QWidget):
                 """)
 
         # 关闭按钮
-        close_btn = QPushButton()
-        close_btn.setIcon(QIcon('img/close_icon.png'))
-        close_btn.setIconSize(QSize(32, 32))
-
-        close_btn.setStyleSheet("""
+        close_button = QPushButton("关闭")
+        close_button.setStyleSheet("""
                     QPushButton {
-                        background: transparent;
+                        background-color: white;
+                        color: black;
                         border: none;
-                        border-radius: 15px;
+                        border-radius: 8px;
+                        padding: 6px 12px;
                     }
                     QPushButton:hover {
-                        background: rgba(255, 255, 255, 0.1);
+                        background-color: rgba(192,192,192,0.5);
                     }
                 """)
-        close_btn.clicked.connect(self.close)
+        close_button.clicked.connect(self.close)
+
 
         title_layout.addWidget(title_icon)
         title_layout.addWidget(title_text)
         title_layout.addStretch()
-        title_layout.addWidget(close_btn)
+        title_layout.addWidget(close_button)
 
         main_layout.addWidget(title_bar)
 
