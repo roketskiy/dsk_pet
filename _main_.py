@@ -26,7 +26,7 @@ class DesktopPet(QWidget):
 
         self.chat_window = None
 
-        self.weather_window = None
+        self.weather_window = WeatherWindow(self)
 
 
         self.weather_label = QLabel(self)
@@ -98,6 +98,7 @@ class DesktopPet(QWidget):
         self.exit_action.triggered.connect(self.close)
         self.menu.addAction(self.exit_action)
         self.menu.addSeparator()
+        self.update_weather_icon()
 
 
 
@@ -105,7 +106,7 @@ class DesktopPet(QWidget):
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setGeometry(1200, 800, 180, 180)
-        self.update_weather_icon()
+        'self.update_weather_icon()'
 
 
     def closeEvent(self, event):
@@ -174,14 +175,13 @@ class DesktopPet(QWidget):
 
     def update_weather_icon(self):
         """更新天气图标"""
-        if not self.weather_window:
-            self.weather_window = WeatherWindow(self)
+
         self.weather_label.setPixmap(QPixmap(self.weather_window.get_current_weather_icon()))
 
     def show_weather_window(self):
         """显示天气详情窗口"""
-        if not self.weather_window:
-            self.weather_window = WeatherWindow(self)
+
+
         self.weather_window.weather_show()
 
 if __name__ == "__main__":

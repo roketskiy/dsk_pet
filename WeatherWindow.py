@@ -49,7 +49,7 @@ class WeatherWindow(QWidget):
         title_bar.setFixedHeight(50)
         # 设置标题栏的样式表，包括背景色、圆角和内边距
         title_bar.setStyleSheet("""
-                            background: rgba(204,229,255,0.3);
+                            background: white;
                             border-top-left-radius: 15px;
                             border-top-right-radius: 15px;
                             padding-left: 15px;
@@ -78,14 +78,14 @@ class WeatherWindow(QWidget):
         close_button = QPushButton("关闭")
         close_button.setStyleSheet("""
             QPushButton {
-                background-color: #ff5722;
-                color: white;
+                background-color: white;
+                color: black;
                 border: none;
                 border-radius: 8px;
                 padding: 6px 12px;
             }
             QPushButton:hover {
-                background-color: #f4511e;
+                background-color: rgba(192,192,192,0.5);
             }
         """)
         close_button.clicked.connect(self.weather_close)
