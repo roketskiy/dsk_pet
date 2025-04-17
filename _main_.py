@@ -1,12 +1,8 @@
 import sys
 import random
-from datetime import datetime
-
-import requests
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QMovie, QPixmap
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel,QMenu, QAction,  QMessageBox)
-
 from PetDataHandler import PetDataHandler
 from PsychChatWindow import PsychChatWindow
 from WeatherWindow import WeatherWindow
