@@ -106,19 +106,22 @@ class WeatherWindow(QWidget):
                             background: #ffffff;
                             border-bottom-left-radius: 15px;
                             border-bottom-right-radius: 15px;
+                            font-family: 'Microsoft YaHei';
+                            font-weight: bold;
                         """)
         layout= QVBoxLayout(mid_body)
         layout.setContentsMargins(10, 10, 10, 10)
 
 
         # 详细天气信息
+        self.weather_wealabel=QLabel()
         self.weather_info = QLabel()
         self.temp_label = QLabel()
         self.wind_label = QLabel()
         self.humidity_label = QLabel()
         self.report_time_label = QLabel()
 
-
+        layout.addWidget(self.weather_wealabel)
         layout.addWidget(self.temp_label)
         layout.addWidget(self.wind_label)
         layout.addWidget(self.humidity_label)
@@ -182,6 +185,7 @@ class WeatherWindow(QWidget):
 
 
                 # 更新天气信息
+                self.weather_wealabel.setText(f"天气: {weather_info['weather']}")
                 self.weather_info.setText(f"{weather_info['province']} {weather_info['city']}")
                 self.temp_label.setText(f"温度: {weather_info['temperature']}°C")
                 self.wind_label.setText(f"风力: {weather_info['windpower']}级 {weather_info['winddirection']}")
@@ -215,14 +219,14 @@ class WeatherWindow(QWidget):
             "中雪": "img/大雪.png",
             "大雪": "img/大雪.png",
             "暴雪": "img/大雪.png",
-            "阵雨": "img/雨天.png",
-            "细雨": "img/雨天.png",
-            "小雨": "img/雨天.png",
-            "中雨": "img/雨天.png",
-            "大雨": "img/雨天.png",
-            "暴雨": "img/雨天.png",
-            "大暴雨": "img/雨天.png",
-            "特大暴雨": "img/雨天.png",
+            "阵雨": "img/小雨.png",
+            "细雨": "img/小雨.png",
+            "小雨": "img/小雨.png",
+            "中雨": "img/大雨.png",
+            "大雨": "img/大雨.png",
+            "暴雨": "img/大雨.png",
+            "大暴雨": "img/大雨.png",
+            "特大暴雨": "img/大雨.png",
             "雷阵雨": "img/雷电.png",
             "雷阵雨伴有冰雹": "img/雷电.png",
             "有风": "img/风.png",
