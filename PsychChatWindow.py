@@ -4,10 +4,6 @@ from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QWidget,  QVBoxLayout, QHBoxLayout, QLabel, QPushButton, \
     QScrollArea, QLineEdit, QApplication
 
-from PetDataHandler import PetDataHandler
-
-
-
 class ChatWorker(QThread):
     response_received = pyqtSignal(str, bool)
     error_occurred = pyqtSignal(str)
@@ -68,7 +64,7 @@ class ChatWorker(QThread):
 
 
 class PsychChatWindow(QWidget):
-    def __init__(self,parent_pet=None):
+    def __init__(self,parent_pet=None,PDH=None):
         super().__init__()
         self.send_btn = None
         self.input_box = None
@@ -76,7 +72,13 @@ class PsychChatWindow(QWidget):
         self.worker = None
         self.chat_container = None
         self.chat_layout = None
+
+
+
         self.parent_pet = parent_pet
+
+        self.PDH= PDH
+
         # 添加窗口图标设置
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
@@ -85,11 +87,6 @@ class PsychChatWindow(QWidget):
         )
         self.setWindowTitle('小忆')
         self.setFixedSize(380, 500)  # 固定窗口大小
-
-
-
-
-        self.data_handler = PetDataHandler()
 
         self.main_container = QWidget(self)
         self.main_container.setObjectName("mainContainer")
@@ -386,7 +383,8 @@ class PsychChatWindow(QWidget):
 
         self.add_message("user", user_input)
         self.messages.append({"role": "user", "content": user_input})
-        self.data_handler.log_chat_message("user", user_input)
+        self.PDH.log_chat_message('user', user_input)
+
         self.input_box.clear()
 
         self.worker = ChatWorker(self.messages.copy(), user_input)
@@ -411,10 +409,12 @@ class PsychChatWindow(QWidget):
         if is_system:
             self.add_message("system", response)
             self.messages.append({"role": "system", "content": response})
-            self.data_handler.log_chat_message("system", response)
+            self.PDH.long_log_chat_message('system', response)
+
         else:
             self.add_message("assistant", response)
             self.messages.append({"role": "assistant", "content": response})
-            self.data_handler.log_chat_message("assistant", response)
+            self.PDH.log_chat_message('assistant', response)
+
 
 

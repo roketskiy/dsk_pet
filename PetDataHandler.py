@@ -2,45 +2,37 @@ import sqlite3
 import uuid
 from PetDatabase import PetDatabase
 
+
 class PetDataHandler:
     def __init__(self):
         self.db = PetDatabase()
         self.current_session = None
-        self.user_id = self._get_or_create_user()  # 初始化时获取或创建用户
-        self.message_counter = 0
         self.conn = self.db.conn
 
-    def _get_or_create_user(self):
-        """获取或创建唯一用户"""
-        cursor = self.db.conn.cursor()
-
-        # 尝试获取现有用户
-        cursor.execute("SELECT user_id FROM users LIMIT 1")
-        user = cursor.fetchone()
-
-        if user:
-            return user[0]
-        else:
-            # 创建新用户
-            user_id = str(uuid.uuid4())
-            cursor.execute("INSERT INTO users (user_id) VALUES (?)", (user_id,))
-            self.db.conn.commit()
-            return user_id
-
-    def start_session(self):
+    def start_session(self, username="default"):
         """开始新会话"""
         try:
-            session_id = str(uuid.uuid4())
             cursor = self.db.conn.cursor()
 
+            # 检查用户是否存在，不存在则创建
+            cursor.execute("SELECT user_id FROM users WHERE username=?", (username,))
+            user = cursor.fetchone()
+
+            if not user:
+                cursor.execute("INSERT INTO users (username) VALUES (?)", (username,))
+                user_id = cursor.lastrowid
+            else:
+                user_id = user[0]
+
+            # 创建新会话
+            session_id = str(uuid.uuid4())
             cursor.execute(
                 "INSERT INTO sessions (session_id, user_id) VALUES (?, ?)",
-                (session_id, self.user_id)
+                (session_id, user_id)
             )
 
             self.db.conn.commit()
             self.current_session = session_id
-            self.message_counter = 0
             return session_id
 
         except sqlite3.Error as e:
@@ -55,7 +47,7 @@ class PetDataHandler:
         try:
             cursor = self.db.conn.cursor()
             cursor.execute(
-                "UPDATE sessions SET end_time=CURRENT_TIMESTAMP WHERE session_id=?",
+                "UPDATE sessions SET end_time=datetime('now', 'localtime') WHERE session_id=?",
                 (self.current_session,)
             )
             self.db.conn.commit()
@@ -66,21 +58,18 @@ class PetDataHandler:
             raise Exception(f"无法结束会话: {str(e)}")
 
     def log_chat_message(self, role, content):
-        """记录聊天消息（带时间戳和顺序）"""
+        """记录聊天消息"""
         if not self.current_session:
             return
 
         try:
-            self.message_counter += 1
             cursor = self.db.conn.cursor()
-
             cursor.execute(
                 """INSERT INTO chat_logs 
-                (session_id, message_index, role, content) 
-                VALUES (?, ?, ?, ?)""",
-                (self.current_session, self.message_counter, role, content)
+                (session_id, role, content) 
+                VALUES (?, ?, ?)""",
+                (self.current_session, role, content)
             )
-
             self.db.conn.commit()
 
         except sqlite3.Error as e:
@@ -113,45 +102,49 @@ class PetDataHandler:
             self.db.conn.rollback()
             raise Exception(f"无法记录游戏得分: {str(e)}")
 
-
-
     def __del__(self):
         self.conn.close()
 
-    def get_chat_history(self, session_id=None):
-        """获取指定会话的完整聊天记录（按时间顺序）"""
-        session_id = session_id or self.current_session
-        if not session_id:
-            return []
-
-        cursor = self.db.conn.cursor()
-        cursor.execute("""
-            SELECT role, content, timestamp 
+    def get_chat_history(self, session_id):
+        """获取指定会话的聊天记录"""
+        cursor = self.conn.cursor()
+        cursor.execute(
+            """SELECT role, content, timestamp 
             FROM chat_logs 
             WHERE session_id = ? 
-            ORDER BY message_index
-        """, (session_id,))
+            ORDER BY timestamp""",
+            (session_id,)
+        )
         return cursor.fetchall()
 
-    def get_user_stats(self):
+    def get_user_stats(self, username):
         """获取用户统计数据"""
-        cursor = self.db.conn.cursor()
+        cursor = self.conn.cursor()
 
-        # 总得分和会话次数
-        cursor.execute("""
-            SELECT 
-                COUNT(*) as session_count,
-                SUM(total_score) as total_score,
-                SUM(duration) as total_duration
+        # 总得分
+        cursor.execute(
+            """SELECT SUM(total_score) 
             FROM sessions 
-            WHERE user_id = ?
-        """, (self.user_id,))
+            WHERE user_id = (
+                SELECT user_id FROM users WHERE username = ?
+            )""",
+            (username,)
+        )
+        total_score = cursor.fetchone()[0] or 0
 
-        stats = cursor.fetchone()
+        # 会话次数
+        cursor.execute(
+            """SELECT COUNT(*) 
+            FROM sessions 
+            WHERE user_id = (
+                SELECT user_id FROM users WHERE username = ?
+            )""",
+            (username,)
+        )
+        session_count = cursor.fetchone()[0]
 
         return {
-            'user_id': self.user_id,
-            'session_count': stats[0] or 0,
-            'total_score': stats[1] or 0,
-            'total_duration': stats[2] or 0  # 总时长(秒)
+            'username': username,
+            'total_score': total_score,
+            'session_count': session_count
         }

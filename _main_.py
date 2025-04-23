@@ -13,8 +13,6 @@ from WeatherWindow import WeatherWindow
 class DesktopPet(QWidget):
     def __init__(self):
         super().__init__()
-
-
         self.current_animation = None
         self.drag_start_pos = None
         self.click_threshold = 10
@@ -36,7 +34,6 @@ class DesktopPet(QWidget):
 
         #天气窗口
         self.weather_window = WeatherWindow(self)
-
         self.weather_label = QLabel(self)
         self.weather_label.setPixmap(QPixmap("img/天气-未知.png"))
         self.weather_label.setFixedSize(40, 40)
@@ -45,8 +42,7 @@ class DesktopPet(QWidget):
         self.weather_label.setStyleSheet("border: none;")
 
 
-        self.data_handler = PetDataHandler()
-        self.session_id = self.data_handler.start_session()
+
 
         self.action_timer = QTimer(self)
         self.action_timer.timeout.connect(self.random_action)
@@ -59,6 +55,9 @@ class DesktopPet(QWidget):
         # RPG游戏
         self.RPG_game_window = None
 
+
+        self.PDH= PetDataHandler()
+        self.PDH.start_session()
 
         # 右键菜单
         self.menu = QMenu(self)
@@ -162,7 +161,7 @@ class DesktopPet(QWidget):
             self.weather_window.close()
         if self.RPG_game_window:
             self.RPG_game_window.game_close()
-        self.data_handler.end_session()
+        self.PDH.end_session()
         event.accept()
 
     def init_animation(self):
@@ -229,7 +228,7 @@ class DesktopPet(QWidget):
 
     def show_chat_window(self):
         if not self.chat_window:
-            self.chat_window = PsychChatWindow(self)  # 传递self作为父窗口
+            self.chat_window = PsychChatWindow(self,self.PDH)  # 传递self作为父窗口
         self.chat_window.show()
 
     def update_weather_icon(self):
