@@ -160,7 +160,7 @@ class DesktopPet(QWidget):
         if self.weather_window:
             self.weather_window.close()
         if self.RPG_game_window:
-            self.RPG_game_window.game_close()
+            self.RPG_game_window.close()
         self.PDH.end_session()
         event.accept()
 
@@ -228,7 +228,7 @@ class DesktopPet(QWidget):
 
     def show_chat_window(self):
         if not self.chat_window:
-            self.chat_window = PsychChatWindow(self,self.PDH)  # 传递self作为父窗口
+            self.chat_window = PsychChatWindow(self,self.PDH)
         self.chat_window.show()
 
     def update_weather_icon(self):
@@ -246,7 +246,7 @@ class DesktopPet(QWidget):
 
         if self.RPG_game_window:
             self.RPG_game_window.close()  # 关闭旧窗口
-        self.RPG_game_window = RPGGame()  # 创建新实例
+        self.RPG_game_window = RPGGame(self.PDH)
         self.RPG_game_window.RPG_game_show()
 
 

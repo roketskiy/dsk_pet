@@ -72,6 +72,7 @@ class PsychChatWindow(QWidget):
         self.worker = None
         self.chat_container = None
         self.chat_layout = None
+        self.is_waiting_response = False
 
 
 
@@ -385,6 +386,7 @@ class PsychChatWindow(QWidget):
         self.messages.append({"role": "user", "content": user_input})
         self.PDH.log_chat_message('user', user_input)
 
+
         self.input_box.clear()
 
         self.worker = ChatWorker(self.messages.copy(), user_input)
@@ -393,6 +395,8 @@ class PsychChatWindow(QWidget):
         self.worker.start()
 
         self.send_btn.setEnabled(False)
+        self.is_waiting_response = True
+        self.input_box.setReadOnly(self.is_waiting_response)
         self.input_box.setPlaceholderText("小忆正在思考中...")
 
     def _scroll_to_top(self):
@@ -404,17 +408,24 @@ class PsychChatWindow(QWidget):
 
     def handle_response(self, response, is_system):
         self.send_btn.setEnabled(True)
+        self.is_waiting_response = False
+        self.input_box.setReadOnly(self.is_waiting_response)
         self.input_box.setPlaceholderText("输入你的想法...")
 
         if is_system:
             self.add_message("system", response)
             self.messages.append({"role": "system", "content": response})
-            self.PDH.long_log_chat_message('system', response)
+            self.PDH.log_chat_message('system', response)
 
         else:
             self.add_message("assistant", response)
             self.messages.append({"role": "assistant", "content": response})
             self.PDH.log_chat_message('assistant', response)
 
-
+    def ignore_key(self, event):
+        if event.key() in (Qt.Key_Return, Qt.Key_Enter):
+            if self.is_waiting_response:
+                event.ignore()  # 忽略回车键
+                return
+        super().keyPressEvent(event)
 

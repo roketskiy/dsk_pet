@@ -4,8 +4,11 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QHBoxLayout, QLab
 import random
 
 class RPGGame(QWidget):
-    def __init__(self):
+    def __init__(self,PDH):
         super().__init__()
+
+        self.PDH=PDH
+
         self.setWindowTitle("猜拳小游戏")
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
@@ -398,6 +401,7 @@ class RPGGame(QWidget):
 
 
     def game_close(self):
+            self.PDH.log_game_score(self.score_this)
             self.score_this = 0
             self.score_label.setText("积分: 0")
             self.close()
