@@ -1,6 +1,6 @@
 import sys
 import random
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt, QTimer, QPropertyAnimation, QPoint
 from PyQt5.QtGui import QMovie, QPixmap
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel,QMenu, QAction)
 from PetDataHandler import PetDataHandler
@@ -22,6 +22,26 @@ class DesktopPet(QWidget):
         self.click_start_pos = None
         self.clk_start_time = None
         self.is_dragging = False
+
+
+
+        self.bubble_timer= QTimer(self)
+        self.bubble_timer.timeout.connect(self.show_random_bubble)
+        self.bubble_timer.start(180000)
+        self.bubble_message=None
+        self.bubble = QLabel(self)
+        self.bubble.setStyleSheet("""
+                    QLabel {
+                        background-color: white;
+                        border: 2px solid #88aaff;
+                        border-radius: 10px;
+                        padding: 5px;
+                        font-size: 12px;
+                        color: #333;
+                    }
+                """)
+        self.bubble.hide()
+        self.bubble_duration = 3000  # 气泡显示3秒
 
 
         self.clk_timer = QTimer()
@@ -150,8 +170,8 @@ class DesktopPet(QWidget):
     def init_ui(self):
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setGeometry(1200, 800, 180, 180)
-        'self.update_weather_icon()'
+        self.setGeometry(1200, 800, 200, 200)
+
 
 
     def closeEvent(self, event):
@@ -249,6 +269,38 @@ class DesktopPet(QWidget):
         self.RPG_game_window = RPGGame(self.PDH)
         self.RPG_game_window.RPG_game_show()
 
+
+    def show_random_bubble(self):
+        if random.random() < 0.7:
+            mes=self.get_ramdom_message()
+            self.display_bubble(mes)
+    def display_bubble(self,message):
+        self.bubble.setText(message)
+        self.bubble.adjustSize()
+
+        # 定位气泡在桌宠旁边
+
+
+        self.bubble.move(30,0)
+        self.bubble.show()
+
+        # 定时隐藏气泡
+        QTimer.singleShot(self.bubble_duration, self.bubble.hide)
+
+
+    def get_ramdom_message(self):
+        andomresponses = [
+            "今天过得怎么样呀？",
+            "有什么想和我分享的吗？",
+            "我在这里陪着你呢~",
+            "最近有什么开心的事吗？",
+            "需要我为你放首轻音乐吗？",
+            "记得多喝水哦~",
+            "深呼吸，放松一下肩膀",
+            "你笑起来一定很好看",
+            "要不要一起数五下深呼吸？"
+            ]
+        return random.choice(andomresponses)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
