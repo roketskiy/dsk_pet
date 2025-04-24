@@ -3,11 +3,12 @@ from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QHBoxLayout, QLabel, QMessageBox
 import random
 
+
 class RPGGame(QWidget):
-    def __init__(self,PDH):
+    def __init__(self, PDH):
         super().__init__()
 
-        self.PDH=PDH
+        self.PDH = PDH
 
         self.setWindowTitle("猜拳小游戏")
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
@@ -22,7 +23,7 @@ class RPGGame(QWidget):
                                 border: 1px;
                             }
                         """)
-        self.score_this=0
+        self.score_this = 0
 
         self.player_choice = None  # 玩家选择
         self.computer_choice = None  # 电脑选择
@@ -42,7 +43,6 @@ class RPGGame(QWidget):
                                                                      Qt.SmoothTransformation)
         self.paper_pixmap = QPixmap(self.paper_128_img).scaled(128, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.win_pixmap = QPixmap(self.win_img).scaled(128, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-
 
         self.init_UI()
 
@@ -114,36 +114,34 @@ class RPGGame(QWidget):
                                     font-family: 'Microsoft YaHei';
                                     font-weight: bold;
                                 """)
-        mid_body.setFixedSize(400,200)
+        mid_body.setFixedSize(400, 200)
 
-        contract_layout= QHBoxLayout(mid_body)
+        contract_layout = QHBoxLayout(mid_body)
 
-
-        self.player_label =QLabel()
-        self.player_label.setPixmap(QPixmap(self.default_img).scaled(128,128, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.player_label = QLabel()
+        self.player_label.setPixmap(
+            QPixmap(self.default_img).scaled(128, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation))
 
         self.computer_label = QLabel()
-        self.computer_label.setPixmap(QPixmap(self.default_img).scaled(128,128, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.computer_label.setPixmap(
+            QPixmap(self.default_img).scaled(128, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation))
 
         vs_label = QLabel()
-        vs_label.setPixmap(QPixmap('img/vs.png').scaled(64,64, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        vs_label.setPixmap(QPixmap('img/vs.png').scaled(64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         vs_label.setAlignment(Qt.AlignCenter)
-
 
         contract_layout.addWidget(self.player_label)
         contract_layout.addWidget(vs_label)
         contract_layout.addWidget(self.computer_label)
 
-
-        info_part= QWidget()
-        info_layout= QHBoxLayout(info_part)
+        info_part = QWidget()
+        info_layout = QHBoxLayout(info_part)
         info_part.setStyleSheet("""
                                 QWidget {
                                 background: white;
                                 }
-        
-        """)
 
+        """)
 
         me_label = QLabel('我')
         me_label.setStyleSheet("""
@@ -156,11 +154,11 @@ class RPGGame(QWidget):
                                                 qproperty-alignment: 'AlignCenter';  /* 水平和垂直居中 */
                                                 border:1px solid black;
                                                 }
-                                               
+
 
                                     """)
 
-        self.score_label= QLabel()
+        self.score_label = QLabel()
         self.score_label.setText(f"积分:{self.score_this}")
         self.score_label.setStyleSheet("""
                                     QLabel {
@@ -170,10 +168,10 @@ class RPGGame(QWidget):
                                         font-weight: bold;
                                         border:1px solid black;
                                         }
-                            
+
                             """)
 
-        computer_label= QLabel()
+        computer_label = QLabel()
         computer_label.setText("电脑")
         computer_label.setStyleSheet("""
                                                     QLabel {
@@ -187,29 +185,25 @@ class RPGGame(QWidget):
 
                                             """)
 
-
         info_layout.addWidget(me_label)
         info_layout.addWidget(self.score_label)
         info_layout.addWidget(computer_label)
 
-
         main_layout.addWidget(mid_body)
         main_layout.addWidget(info_part)
 
-
-        choice_part= QWidget()
+        choice_part = QWidget()
         choice_part.setStyleSheet("""
                                     QWidget {
                                         background-color: white;
                                         border-bottom-left-radius: 15px;
                                         border-bottom-right-radius: 15px;}
                 """)
-        choice_layout= QHBoxLayout(choice_part)
-        choice_layout.setContentsMargins(20,20,20,20)
+        choice_layout = QHBoxLayout(choice_part)
+        choice_layout.setContentsMargins(20, 20, 20, 20)
         choice_layout.setSpacing(10)
 
-
-        a_btn= QPushButton()
+        a_btn = QPushButton()
         a_btn.setStyleSheet(
             """
             QPushButton {
@@ -219,15 +213,15 @@ class RPGGame(QWidget):
             QPushButton:hover {
                         background-color: rgba(192,192,192,0.5);
                     }
-                
+
             """
         )
-        a_icon=QIcon(self.rock_64_img)
+        a_icon = QIcon(self.rock_64_img)
         a_btn.setIcon(a_icon)
-        a_btn.setIconSize(QSize(64,64))
+        a_btn.setIconSize(QSize(64, 64))
         a_btn.clicked.connect(self.a_btn_clicked)
 
-        b_btn= QPushButton()
+        b_btn = QPushButton()
         b_btn.setStyleSheet(
             """
             QPushButton {
@@ -240,12 +234,12 @@ class RPGGame(QWidget):
 
             """
         )
-        b_icon=QIcon(self.scissors_64_img)
+        b_icon = QIcon(self.scissors_64_img)
         b_btn.setIcon(b_icon)
-        b_btn.setIconSize(QSize(64,64))
+        b_btn.setIconSize(QSize(64, 64))
         b_btn.clicked.connect(self.b_btn_clicked)
 
-        c_btn= QPushButton()
+        c_btn = QPushButton()
         c_btn.setStyleSheet(
             """
             QPushButton {
@@ -258,11 +252,10 @@ class RPGGame(QWidget):
 
             """
         )
-        c_icon=QIcon(self.paper_64_img)
+        c_icon = QIcon(self.paper_64_img)
         c_btn.setIcon(c_icon)
-        c_btn.setIconSize(QSize(64,64))
+        c_btn.setIconSize(QSize(64, 64))
         c_btn.clicked.connect(self.c_btn_clicked)
-
 
         choice_layout.addWidget(a_btn)
         choice_layout.addWidget(b_btn)
@@ -285,7 +278,7 @@ class RPGGame(QWidget):
     def c_btn_clicked(self):
         self.player_choice = "paper"
         self.player_label.setPixmap(
-                QPixmap(self.paper_128_img).scaled(128, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            QPixmap(self.paper_128_img).scaled(128, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.play_game()
 
     def b_btn_clicked(self):
@@ -308,7 +301,6 @@ class RPGGame(QWidget):
     def RPG_game_show(self):
         super().show()
 
-
     def play_game(self):
         """执行游戏逻辑"""
         # 禁用按钮防止重复点击
@@ -316,13 +308,12 @@ class RPGGame(QWidget):
             if btn.text() not in ["关闭"]:  # 保留关闭按钮可用
                 btn.setEnabled(False)
 
-    # 电脑随机选择
+        # 电脑随机选择
         choices = ["rock", "scissors", "paper"]
         self.computer_choice = random.choice(choices)
 
-    # 显示电脑的选择（可以添加动画效果）
+        # 显示电脑的选择（可以添加动画效果）
         self.animate_computer_choice()
-
 
     def animate_computer_choice(self):
         """动画显示电脑的选择过程"""
@@ -331,7 +322,6 @@ class RPGGame(QWidget):
         self.animation_timer = QTimer(self)
         self.animation_timer.timeout.connect(self.update_computer_animation)
         self.animation_timer.start(150)  # 每100毫秒更新一次
-
 
     def update_computer_animation(self):
         """更新电脑选择的动画"""
@@ -370,7 +360,6 @@ class RPGGame(QWidget):
                 if btn.text() not in ["关闭"]:
                     btn.setEnabled(True)
 
-
     def determine_winner(self):
         """判断胜负并更新积分"""
         if self.player_choice == self.computer_choice:
@@ -396,14 +385,13 @@ class RPGGame(QWidget):
         elif message == "你赢了！":
             self.player_label.setPixmap(
                 self.win_pixmap)
-        else:pass
-
-
+        else:
+            pass
 
     def game_close(self):
-            self.PDH.log_game_score(self.score_this)
-            self.score_this = 0
-            self.score_label.setText("积分: 0")
-            self.close()
+        self.PDH.log_game_score(self.score_this)
+        self.score_this = 0
+        self.score_label.setText("积分: 0")
+        self.close()
 
 

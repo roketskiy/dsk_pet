@@ -84,16 +84,24 @@ class PetDataHandler:
         try:
             cursor = self.db.conn.cursor()
 
-            # 记录单次得分
+            # 获取用户所有会话的最新得分记录作为初始值
             cursor.execute(
-                "INSERT INTO game_scores (session_id, points) VALUES (?, ?)",
-                (self.current_session, points)
+                """SELECT gs.total_score 
+                FROM game_scores gs 
+                JOIN sessions s ON gs.session_id = s.session_id
+                WHERE s.user_id = (
+                    SELECT user_id FROM sessions WHERE session_id = ?
+                )
+                ORDER BY gs.score_id DESC LIMIT 1""",
+                (self.current_session,)
             )
+            last_total = cursor.fetchone()
+            base_score = last_total[0] if last_total else 0
 
-            # 更新会话总得分
+            # 记录单次得分并更新总得分
             cursor.execute(
-                "UPDATE sessions SET total_score=total_score+? WHERE session_id=?",
-                (points, self.current_session)
+                "INSERT INTO game_scores (session_id, points, total_score) VALUES (?, ?, ?)",
+                (self.current_session, points, base_score + points)
             )
 
             self.db.conn.commit()
@@ -123,9 +131,10 @@ class PetDataHandler:
 
         # 总得分
         cursor.execute(
-            """SELECT SUM(total_score) 
-            FROM sessions 
-            WHERE user_id = (
+            """SELECT SUM(gs.total_score) 
+            FROM game_scores gs 
+            JOIN sessions s ON gs.session_id = s.session_id
+            WHERE s.user_id = (
                 SELECT user_id FROM users WHERE username = ?
             )""",
             (username,)

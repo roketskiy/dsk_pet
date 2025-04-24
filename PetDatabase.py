@@ -29,7 +29,6 @@ class PetDatabase:
             user_id INTEGER NOT NULL,
             start_time TIMESTAMP DEFAULT (datetime('now', 'localtime')),
             end_time TIMESTAMP DEFAULT NULL,
-            total_score INTEGER DEFAULT 0,
             FOREIGN KEY (user_id) REFERENCES users(user_id)
         )
         """)
@@ -53,6 +52,7 @@ class PetDatabase:
             session_id TEXT NOT NULL,
             score_time TIMESTAMP DEFAULT (datetime('now', 'localtime')),
             points INTEGER NOT NULL,
+            total_score INTEGER DEFAULT 0,
             FOREIGN KEY (session_id) REFERENCES sessions(session_id)
         )
         """)

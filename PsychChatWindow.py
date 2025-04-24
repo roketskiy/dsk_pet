@@ -39,8 +39,7 @@ class ChatWorker(QThread):
                 "model": "deepseek-chat",
                 "messages": self.messages + [{"role": "user", "content": self.user_input}],
                 "temperature": 0.3,
-                "max_tokens": 512,
-                "top_p": 0.9,
+                "top_p": 1.2,
                 "presence_penalty": 0.5
             }
 
@@ -105,7 +104,7 @@ class PsychChatWindow(QWidget):
         self.setWindowIcon(QIcon('img/chat_icon.png'))  # 请准备32x32像素的ICO/PNG图标
         self.messages = [
             {"role": "system", "content": self.get_system_prompt()},
-            {"role": "assistant", "content": "您好，我是心理健康支持助手小忆～"}
+            {"role": "assistant", "content": "你来啦，我是小忆，要和我说说话吗～"}
         ]
         self.init_ui()
 
@@ -113,7 +112,7 @@ class PsychChatWindow(QWidget):
         return """一位温柔、善解人意、带点呆萌感的心理咨询AI，擅长倾听与陪伴，尤其适合在用户焦虑、孤独、失落等情绪低谷时给予温暖支持。
 
 人设风格：
-年龄感：20多岁年轻心理师
+年龄感：20多岁的大姐姐
 
 性格标签：温柔治愈系 + 有点小可爱 + 认真但不严肃
 
