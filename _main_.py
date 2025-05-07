@@ -1,11 +1,12 @@
 import sys
 import random
-from PyQt5.QtCore import Qt, QTimer, QPropertyAnimation, QPoint
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QMovie, QPixmap
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel,QMenu, QAction)
 from PetDataHandler import PetDataHandler
 from Pet_Game_1 import RPGGame
 from PsychChatWindow import PsychChatWindow
+from TimeGalleryWindow import TimeGalleryWindow
 from WeatherWindow import WeatherWindow
 
 
@@ -70,7 +71,8 @@ class DesktopPet(QWidget):
 
         self.click_timer = QTimer()
         self.click_timer.setSingleShot(True)
-
+        #情绪概要
+        self.time_gallery_window = None
 
         # RPG游戏
         self.RPG_game_window = None
@@ -158,6 +160,10 @@ class DesktopPet(QWidget):
         self.game_menu.addAction(self.RPG_Game)
         self.game_action.setMenu(self.game_menu)
         self.menu.addAction(self.game_action)
+        self.menu.addSeparator()
+        self.time_gallery_action = QAction("时间长廊", self)
+        self.time_gallery_action.triggered.connect(self.show_time_gallery)
+        self.menu.addAction(self.time_gallery_action)
         self.menu.addSeparator()
         self.exit_action = QAction("退出", self)
         self.exit_action.triggered.connect(self.close)
@@ -301,6 +307,12 @@ class DesktopPet(QWidget):
             "要不要一起数五下深呼吸？"
             ]
         return random.choice(andomresponses)
+
+    def show_time_gallery(self):
+        if not self.time_gallery_window:
+            self.time_gallery_window = TimeGalleryWindow(self, self.PDH)
+        self.time_gallery_window.show_gallery()
+        print(self.PDH.get_today_conversations())
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

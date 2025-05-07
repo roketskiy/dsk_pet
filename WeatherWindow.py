@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import ( QVBoxLayout, QLabel, QHBoxLayout, QWidget, QApplic
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 import requests
-
+import global_value
 
 class WeatherWindow(QWidget):
     def __init__(self,parent=None  ):
@@ -182,8 +182,7 @@ class WeatherWindow(QWidget):
                 self.current_weather = weather_info["weather"]
 
                 # 更新天气图标
-
-
+                global_value.CURRENT_WEATHER= self.current_weather
                 # 更新天气信息
                 self.weather_wealabel.setText(f"天气: {weather_info['weather']}")
                 self.weather_info.setText(f"{weather_info['province']} {weather_info['city']}")
