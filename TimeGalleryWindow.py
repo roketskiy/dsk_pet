@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea,
-                             QPushButton, QFrame, QApplication)
-from PyQt5.QtCore import Qt,QDateTime
-from PyQt5.QtGui import QPixmap
-import datetime
+                             QPushButton, QApplication, QGraphicsDropShadowEffect)
+from PyQt5.QtCore import Qt, QPropertyAnimation, QEasingCurve
+from PyQt5.QtGui import QPixmap, QColor
+
 
 
 
@@ -142,15 +142,7 @@ class TimeGalleryWindow(QWidget):
             self.timeline_layout.addWidget(card_widget)
 
             # 如果不是最后一张卡片，添加时间线连接线
-            if i < len(cards) - 1:
-                line = QFrame()
-                line.setFrameShape(QFrame.HLine)
-                line.setFrameShadow(QFrame.Sunken)
-                line.setStyleSheet("background: #ADD8E6; "
-                                   "height: 2px;"
-                                   "border-radius: 10px;")
-                line.setFixedHeight(20)
-                self.timeline_layout.addWidget(line)
+
 
     def create_mood_card(self, date, weather, mood_summary,evaluate):
         """创建单个情绪卡片"""
@@ -166,6 +158,14 @@ class TimeGalleryWindow(QWidget):
                 border-radius: 10px; 
             }}
         """)
+
+        shadow = QGraphicsDropShadowEffect()
+        shadow.setBlurRadius(15)
+        shadow.setColor(QColor(0, 0, 0, 60))
+        shadow.setOffset(3, 3)
+        card.setGraphicsEffect(shadow)
+
+        # 设置卡片可接收悬停事件
 
 
 
@@ -221,9 +221,11 @@ class TimeGalleryWindow(QWidget):
 
         # 右侧内容区域
         content_widget = QWidget()
+        content_widget.setStyleSheet("""background: transparent;""")
         content_layout = QVBoxLayout(content_widget)
         content_layout.setContentsMargins(0, 0, 0, 0)
         content_layout.setSpacing(10)
+
 
         # 天气信息
         weather_widget = QWidget()
@@ -397,15 +399,16 @@ class TimeGalleryWindow(QWidget):
 
     def back_color_change(self, point):
         return {
-            0: "#ADD8E6",
-            0.5: "#B4DCD8",
-            1: "#BBE2CA",
-            1.5: "#C2E8BC",
-            2: "#C9EEAE",
-            2.5: "#D0F4A0",
-            3: "#D7FA92",
-            3.5: "#DEF084",
-            4: "#E5F676",
-            4.5: "#FFFFE0",
-            5: "#FFDB58"
+            0: "#99CCFF",
+            0.5: "#99CCFF",
+            1: "#CCFFFF",
+            1.5: "#CCFFFF",
+            2: "#FFFFFF",
+            2.5: "#FFFFFF",
+            3: "#FFE5CC",
+            3.5: "#FFE5CC",
+            4: "#FFCC99",
+            4.5: "#FFCC99",
+            5: "#FFB266"
         }.get(point, "white")
+

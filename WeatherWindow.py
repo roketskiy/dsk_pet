@@ -4,6 +4,7 @@ from PyQt5.QtGui import QPixmap
 import requests
 import global_value
 
+
 class WeatherWindow(QWidget):
     def __init__(self,parent=None  ):
         super().__init__()
@@ -31,6 +32,7 @@ class WeatherWindow(QWidget):
         self.weather_info = None
         self.temp_label = None
 
+        self.get_IP()
         self.init_ui()
 
 
@@ -168,13 +170,8 @@ class WeatherWindow(QWidget):
             self.move(left_x, pet_pos.y())
     def update_weather(self):
         url = "https://restapi.amap.com/v3/weather/weatherInfo"
-        params = {
-            "city": "110101",  # 北京东城区代码
-            "key": "4eb3b110f994aa8aae247ec92a7358ea"
-        }
-
         try:
-            response = requests.get(url, params=params)
+            response = requests.get(url, params={"city": global_value.Params["city"], "key": global_value.Params["key_GD"]})
             weather_data = response.json()
 
             if weather_data["status"] == "1":
@@ -271,3 +268,23 @@ class WeatherWindow(QWidget):
         super().show()
     def weather_close(self):
         self.hide()
+
+    def get_IP(self):
+        pass
+        url = 'https://apis.map.qq.com/ws/location/v1/ip'
+        try:
+            response = requests.get(url, params={'key': global_value.Params["key_QQ"]})
+            ip_data = response.json()
+
+            if ip_data['message'] == "Success":
+                global_value.Params['city'] = ip_data['result']['ad_info']['adcode']
+                print(global_value.Params['city'])
+                return None
+            else:
+                print(f"API返回错误: {ip_data.get('info', '未知错误')}")
+                print(response.json())
+                return None
+
+        except requests.exceptions.RequestException as e:
+            print(f"获取IP失败: {e}")
+            return None

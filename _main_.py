@@ -8,6 +8,7 @@ from Pet_Game_1 import RPGGame
 from PsychChatWindow import PsychChatWindow
 from TimeGalleryWindow import TimeGalleryWindow
 from WeatherWindow import WeatherWindow
+import global_value
 
 
 # ==================== 桌宠主程序 ====================
@@ -187,6 +188,7 @@ class DesktopPet(QWidget):
             self.weather_window.close()
         if self.RPG_game_window:
             self.RPG_game_window.close()
+        self.PDH.log_mood_card(global_value.CURRENT_WEATHER,'好',random.choice([1,2,3,4,5]), "default")
         self.PDH.end_session()
         event.accept()
 

@@ -59,15 +59,15 @@ class PetDatabase:
 
         # 情绪卡片表
         cursor.execute("""
-                CREATE TABLE IF NOT EXISTS mood_cards (
-                    card_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    session_id TEXT NOT NULL,
-                    date DATE NOT NULL DEFAULT (date('now', 'localtime')),
-                    weather TEXT,
-                    mood_summary TEXT,
-                    evaluate FLOAT,
-                    FOREIGN KEY (session_id) REFERENCES sessions(session_id)
-                )
-                """)
+        CREATE TABLE IF NOT EXISTS mood_cards (
+            card_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL, 
+            date DATE NOT NULL DEFAULT (date('now', 'localtime')),
+            weather TEXT,
+            mood_summary TEXT,
+            evaluate FLOAT,
+            FOREIGN KEY (user_id) REFERENCES users(user_id)
+        )
+        """)
 
         self.conn.commit()

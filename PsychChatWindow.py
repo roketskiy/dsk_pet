@@ -3,6 +3,7 @@ from PyQt5.QtCore import QThread, pyqtSignal, Qt, QTimer, QSize
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QWidget,  QVBoxLayout, QHBoxLayout, QLabel, QPushButton, \
     QScrollArea, QLineEdit, QApplication
+import global_value
 
 class ChatWorker(QThread):
     response_received = pyqtSignal(str, bool)
@@ -13,7 +14,7 @@ class ChatWorker(QThread):
         self.messages = messages
         self.user_input = user_input
         self.api_url = "https://api.deepseek.com/chat/completions"
-        self.api_key = "sk-cf02129ea6c64f4b9e4be5c44ad94c72"
+
         self.safety_protocols = {
             "自杀": "建议立即联系心理危机干预热线：400-161-9995",
             "自残": "推荐前往最近的二甲以上医院心理科就诊",
@@ -32,7 +33,7 @@ class ChatWorker(QThread):
 
             headers = {
                 "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.api_key}"
+                "Authorization": f"Bearer {global_value.Params['key_DS']}"
             }
 
             data = {

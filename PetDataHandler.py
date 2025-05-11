@@ -186,30 +186,19 @@ class PetDataHandler:
         }
 
     def get_mood_cards(self, username):
-        """获取用户的所有情绪卡片（简化版，仅查询现有字段）
-
-        参数:
-            username: 要查询的用户名
-
-        返回:
-            包含情绪卡片的列表，每个卡片包含以下字段:
-            - date: 日期
-            - weather: 天气情况
-            - mood_summary: 情绪摘要
-        """
+        """获取用户的所有情绪卡片"""
         cursor = self.conn.cursor()
         cursor.execute(
             """SELECT mc.date, mc.weather, mc.mood_summary, mc.evaluate
             FROM mood_cards mc
-            JOIN sessions s ON mc.session_id = s.session_id
-            JOIN users u ON s.user_id = u.user_id
+            JOIN users u ON mc.user_id = u.user_id
             WHERE u.username = ?
             ORDER BY mc.date DESC""",
             (username,)
         )
         return cursor.fetchall()
 
-    def log_mood_card(self, weather, mood_summary, evaluate):
+    def log_mood_card(self, weather, mood_summary, evaluate, username="default"):
         """记录情绪卡片
         如果当天已有记录则更新，否则新建一条记录（仅基于日期判断）
         """
@@ -217,11 +206,19 @@ class PetDataHandler:
             current_date = datetime.datetime.now().strftime("%Y-%m-%d")
             cursor = self.db.conn.cursor()
 
+            # 获取用户ID
+            cursor.execute("SELECT user_id FROM users WHERE username=?", (username,))
+            user = cursor.fetchone()
+            if not user:
+                raise Exception("用户不存在")
+            user_id = user[0]
+
             # 检查当天是否已有记录（仅基于日期）
             cursor.execute(
-                """SELECT id FROM mood_cards 
-                WHERE date(date) = date(?)""",
-                (current_date,)
+                """SELECT card_id FROM mood_cards 
+                WHERE date(date) = date(?)
+                AND user_id = ?""",
+                (current_date, user_id)
             )
             existing_record = cursor.fetchone()
 
@@ -230,16 +227,17 @@ class PetDataHandler:
                 cursor.execute(
                     """UPDATE mood_cards 
                     SET weather = ?, mood_summary = ?, evaluate = ?
-                    WHERE date(date) = date(?)""",
-                    (weather, mood_summary, evaluate, current_date)
+                    WHERE date(date) = date(?)
+                    AND user_id = ?""",
+                    (weather, mood_summary, evaluate, current_date, user_id)
                 )
             else:
                 # 插入新记录
                 cursor.execute(
                     """INSERT INTO mood_cards 
-                    (date, weather, mood_summary, evaluate) 
-                    VALUES (?, ?, ?, ?)""",
-                    (current_date, weather, mood_summary, evaluate)
+                    (user_id, date, weather, mood_summary, evaluate) 
+                    VALUES (?, ?, ?, ?, ?)""",
+                    (user_id, current_date, weather, mood_summary, evaluate)
                 )
 
             self.db.conn.commit()
