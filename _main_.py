@@ -242,13 +242,11 @@ class DesktopPet(QWidget):
             if not self.is_dragging:
                 elapsed_time = event.timestamp() - self.clk_start_time
                 if elapsed_time < 500:
-                    self.on_click()
+                    pass
                 else :
                     self.on_timeout()
         self.stand_action()
 
-    def on_click(self):
-        pass
 
     def on_timeout(self):
         self.is_dragging = True
@@ -294,7 +292,6 @@ class DesktopPet(QWidget):
 
         # 定时隐藏气泡
         QTimer.singleShot(self.bubble_duration, self.bubble.hide)
-
 
     def get_ramdom_message(self):
         andomresponses = [
