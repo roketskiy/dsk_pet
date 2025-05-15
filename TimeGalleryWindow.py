@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea,
                              QPushButton, QApplication, QGraphicsDropShadowEffect)
-from PyQt5.QtCore import Qt, QPropertyAnimation, QEasingCurve
+from PyQt5.QtCore import Qt, QPropertyAnimation, QEasingCurve, QRect
 from PyQt5.QtGui import QPixmap, QColor
 
 
@@ -159,15 +159,31 @@ class TimeGalleryWindow(QWidget):
             }}
         """)
 
-        shadow = QGraphicsDropShadowEffect()
+        shadow = QGraphicsDropShadowEffect(card)  # 将阴影效果直接绑定到卡片
         shadow.setBlurRadius(15)
         shadow.setColor(QColor(0, 0, 0, 60))
         shadow.setOffset(3, 3)
         card.setGraphicsEffect(shadow)
 
-        # 设置卡片可接收悬停事件
 
-
+        #悬停光效
+        card.setAttribute(Qt.WA_Hover)
+        def enterEvent(event):
+            if event:
+                glow_T_effect = QGraphicsDropShadowEffect(card)
+                glow_T_effect.setBlurRadius(20)  # 光晕模糊半径（越大越柔和）
+                glow_T_effect.setColor(QColor(39, 84, 138, 180))  # 发光颜色（RGBA）
+                glow_T_effect.setOffset(0, 0)  # 偏移量设为0确保均匀发光
+                card.setGraphicsEffect(glow_T_effect)
+        def leaveEvent(event):
+            if event:
+                glow_F_effect = QGraphicsDropShadowEffect(card)
+                glow_F_effect.setBlurRadius(0)  # 光晕模糊半径（越大越柔和）
+                glow_F_effect.setColor(QColor(255, 200, 50, 180))  # 发光颜色（RGBA）
+                glow_F_effect.setOffset(0, 0)  # 偏移量设为0确保均匀发光
+                card.setGraphicsEffect(glow_F_effect)
+        card.enterEvent = enterEvent
+        card.leaveEvent = leaveEvent
 
         layout = QHBoxLayout(card)
         layout.setContentsMargins(15, 15, 15, 15)
@@ -280,7 +296,7 @@ class TimeGalleryWindow(QWidget):
         mood_sum_label.setWordWrap(True)  # 允许文本换行
         mood_sum_label.setStyleSheet("""
             QLabel {
-                background: white;
+                background: transparent;
                 border-radius: 10px;
                 font-size: 14px; 
                 color: #333;
@@ -411,4 +427,3 @@ class TimeGalleryWindow(QWidget):
             4.5: "#FFCC99",
             5: "#FFB266"
         }.get(point, "white")
-

@@ -19,29 +19,145 @@ class DesktopPet(QWidget):
         self.drag_start_pos = None
         self.click_threshold = 10
         self.init_ui()
-        self.init_animation()
-
         self.click_start_pos = None
         self.clk_start_time = None
         self.is_dragging = False
+        self.weather_responses = {
+            # 晴天系列
+            "晴": [
+                "阳光好温暖呀，要不要出去走走？",
+                "看到太阳公公在笑，我的心情也变好了呢~",
+                "记得涂防晒霜哦，我可不想你被晒伤",
+                "这样的好天气，很适合晒被子呢！",
+                "阳光下的你闪闪发光，就像钻石一样✨",
+                "我收集了一袋阳光，送给你当礼物啦~",
+                "蓝天白云在开派对，我们也加入吧！",
+                "太阳能充电中...我的能量满格啦！"
+            ],
+
+            # 多云/阴天系列
+            "多云": [
+                "云朵像棉花糖一样，好想咬一口呀",
+                "太阳在和我们玩捉迷藏呢",
+                "这种天气最适合喝杯热可可了☕",
+                "云层后面藏着很多小星星哦",
+                "阴天也不能阻挡我们保持好心情~",
+                "光线温柔得像妈妈的怀抱",
+                "云朵在天空画画呢，你看像什么？"
+            ],
+
+            # 雨天系列
+            "雨": [
+                "听，雨滴在唱歌呢~嘀嗒嘀嗒",
+                "我帮你数雨滴：1、2、3...哎呀数不过来了",
+                "雨天和巧克力最配了，你说呢？",
+                "彩虹正在云层后面准备惊喜哦",
+                "雨伞战士出动！保护你不被淋湿",
+                "雨水把世界洗得亮晶晶的✨",
+                "我的防水模式已启动，陪你雨中漫步"
+            ],
+
+            # 暴雨系列
+            "暴雨": [
+                "雷公电母今天好激动啊！",
+                "待在室内最安全啦，我保护你",
+                "暴雨交响曲正在上演呢",
+                "我启动了避雷针功能⚡",
+                "雨水像珍珠帘子一样挂在天上",
+                "这种天气最适合窝着看电影了"
+            ],
+
+            # 雪天系列
+            "雪": [
+                "雪花快递员来送冬季礼物啦❄️",
+                "我们一起堆个雪人朋友吧！",
+                "雪花落在鼻尖上凉凉的好有趣",
+                "冬季魔法正在施展~",
+                "雪地留下的小脚印是我们的秘密",
+                "热乎乎的奶茶和雪景最配啦"
+            ],
+
+            # 大风系列
+            "风": [
+                "风姑娘今天心情很激动呢",
+                "我的发型都被吹乱啦，噗哈哈",
+                "听，风在讲远方的故事🌪️",
+                "抱紧我，别被吹跑啦！",
+                "树叶在跳风力发电舞呢"
+            ],
+
+            # 雾霾系列
+            "霾": [
+                "空气净化小卫士上线！",
+                "记得戴好口罩保护自己哦",
+                "等风来，就能看到蓝天啦",
+                "我的防雾霾模式已启动",
+                "我们一起期待好天气吧~"
+            ],
+
+            # 沙尘系列
+            "沙尘": [
+                "沙漠探险队准备出发！",
+                "我的防沙护目镜借给你",
+                "沙沙沙...像在演奏沙漠之歌",
+                "闭上眼睛，想象我们在绿洲"
+            ],
+
+            # 默认通用发言
+            "default": [
+                "今天过得怎么样呀？",
+                "有什么想和我分享的吗？",
+                "我在这里陪着你呢~",
+                "最近有什么开心的事吗？",
+                "需要我为你放首轻音乐吗？",
+                "记得多喝水哦~",
+                "深呼吸，放松一下肩膀",
+                "你笑起来一定很好看",
+                "要不要一起数五下深呼吸？",
+                "我刚刚发现了一个有趣的事情...",
+                "猜猜我在想什么？",
+                "给你表演个魔术：消失的烦恼~",
+                "我偷偷存了好多阳光笑容，送给你",
+                "你是我最重要的人类朋友❤️",
+                "今天也要做最棒的自己！"
+            ]
+        }
+
+        self.weather_mapping = {
+            "晴": "晴", "少云": "晴", "晴间多云": "晴",
+            "阴": "多云", "多云": "多云",
+            "阵雨": "雨", "细雨": "雨", "小雨": "雨", "中雨": "雨",
+            "大雨": "暴雨", "暴雨": "暴雨", "大暴雨": "暴雨", "特大暴雨": "暴雨",
+            "雷阵雨": "暴雨", "雷阵雨伴有冰雹": "暴雨",
+            "雪": "雪", "阵雪": "雪", "小雪": "雪", "中雪": "雪", "大雪": "雪", "暴雪": "雪",
+            "有风": "风", "平静微风": "风", "和风": "风", "清风": "风", "强风": "风",
+            "劲风": "风", "疾风": "风", "大风": "风", "烈风": "风", "风暴": "风",
+            "狂爆风": "风", "飓风": "风", "热带风": "风",
+            "霾": "霾", "中度霾": "霾", "重度霾": "霾", "严重霾": "霾",
+            "雾": "霾", "浓雾": "霾", "强浓雾": "霾", "轻雾": "霾", "大雾": "霾", "特强浓雾": "霾",
+            "沙尘暴": "沙尘", "浮尘": "沙尘", "扬沙": "沙尘", "强沙尘暴": "沙尘"
+        }
 
 
 
         self.bubble_timer= QTimer(self)
         self.bubble_timer.timeout.connect(self.show_random_bubble)
-        self.bubble_timer.start(180000)
+        self.bubble_timer.start(60000)
         self.bubble_message=None
-        self.bubble = QLabel(self)
+        self.bubble = QLabel(None)
+        self.bubble.setWindowFlags(Qt.ToolTip | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.bubble.setStyleSheet("""
-                    QLabel {
-                        background-color: white;
-                        border: 2px solid #88aaff;
-                        border-radius: 10px;
-                        padding: 5px;
-                        font-size: 12px;
-                        color: #333;
-                    }
-                """)
+                QLabel {
+                    background-color: white;
+                    border: 2px solid #88aaff;
+                    padding: 5px;
+                    font-size: 12px;
+                    font-family: 'Microsoft YaHei';
+                    color: #333;
+                    max-width: 200px;  /* 限制最大宽度 */
+                }
+            """)
+        print(self.bubble.styleSheet())
         self.bubble.hide()
         self.bubble_duration = 3000  # 气泡显示3秒
 
@@ -68,7 +184,7 @@ class DesktopPet(QWidget):
 
         self.action_timer = QTimer(self)
         self.action_timer.timeout.connect(self.random_action)
-        self.action_timer.start(10000)
+        self.action_timer.start(60000)
 
         self.click_timer = QTimer()
         self.click_timer.setSingleShot(True)
@@ -171,6 +287,7 @@ class DesktopPet(QWidget):
         self.menu.addAction(self.exit_action)
         self.menu.addSeparator()
         self.update_weather_icon()
+        self.init_animation()
 
 
 
@@ -182,6 +299,7 @@ class DesktopPet(QWidget):
 
 
     def closeEvent(self, event):
+        self.close_ani()
         if self.chat_window:
             self.chat_window.close()
         if self.weather_window:
@@ -195,17 +313,32 @@ class DesktopPet(QWidget):
     def init_animation(self):
         self.animation_label = QLabel(self)
         self.animation_label.move(10,10)
-        self.animations = ["img/stand.gif", "img/walk.gif", "img/sleep.gif"]
+        self.animations = {
+                        'box': 'img/character/box.gif',
+                        'cry': 'img/character/cry.gif',
+                        'excite': 'img/character/excite.gif',
+                        'happy-1': 'img/character/happy-1.gif',
+                        'idle': 'img/character/idle.gif',
+                        'lay': 'img/character/lay.gif',
+                        'sleep-1': 'img/character/sleep-1.gif',
+                        'sleepy-1': 'img/character/sleepy-1.gif',
+                        'surprise': 'img/character/surprise.gif'
+                    }
         self.current_animation = None
-        self.random_action()
+        self.appear_animation()
+
+    def appear_animation(self):
+        self.play_animation(self.animations['box'])
+        self.stand_action()
 
     def stand_action(self):
-        self.play_animation("img/stand.gif")
+        self.play_animation(self.animations['idle'])
 
     def random_action(self):
-        new_animation = random.choice(self.animations)
+        new_animation = random.choice(list(self.animations.values()))
         if new_animation != self.current_animation:
             self.play_animation(new_animation)
+        self.stand_action()
 
     def play_animation(self, gif_path):
         movie = QMovie(gif_path)
@@ -233,7 +366,7 @@ class DesktopPet(QWidget):
                 self.clk_timer.stop()
                 self.is_dragging = True
                 self.move(event.globalPos() - self.drag_start_pos)
-                self.play_animation('img/catch.gif')
+                self.play_animation(self.animations['excite'])
 
 
     def mouseReleaseEvent(self, event):
@@ -250,7 +383,7 @@ class DesktopPet(QWidget):
 
     def on_timeout(self):
         self.is_dragging = True
-        self.play_animation('img/catch.gif')
+        self.play_animation('img/character/surprise.gif')
 
     def show_chat_window(self):
         if not self.chat_window:
@@ -278,40 +411,39 @@ class DesktopPet(QWidget):
 
     def show_random_bubble(self):
         if random.random() < 0.7:
-            mes=self.get_ramdom_message()
+            mes=self.speak_randomly()
             self.display_bubble(mes)
-    def display_bubble(self,message):
+
+    def display_bubble(self, message):
         self.bubble.setText(message)
         self.bubble.adjustSize()
 
-        # 定位气泡在桌宠旁边
+        # 计算气泡位置（在宠物右侧）
+        pet_pos = self.pos()
+        bubble_x = pet_pos.x()  + 45
+        bubble_y = pet_pos.y()
 
-
-        self.bubble.move(30,0)
+        self.bubble.move(bubble_x, bubble_y)
         self.bubble.show()
-
-        # 定时隐藏气泡
         QTimer.singleShot(self.bubble_duration, self.bubble.hide)
 
-    def get_ramdom_message(self):
-        andomresponses = [
-            "今天过得怎么样呀？",
-            "有什么想和我分享的吗？",
-            "我在这里陪着你呢~",
-            "最近有什么开心的事吗？",
-            "需要我为你放首轻音乐吗？",
-            "记得多喝水哦~",
-            "深呼吸，放松一下肩膀",
-            "你笑起来一定很好看",
-            "要不要一起数五下深呼吸？"
-            ]
-        return random.choice(andomresponses)
+    def speak_randomly(self):
+        """随机发言"""
+         # 假设宠物有获取天气的方法
+        weather_type = self.weather_mapping.get(global_value.CURRENT_WEATHER, "default")
+
+        responses = self.weather_responses.get(weather_type, []) + self.weather_responses["default"]
+        message = random.choice(responses)
+        return message
 
     def show_time_gallery(self):
         if not self.time_gallery_window:
             self.time_gallery_window = TimeGalleryWindow(self, self.PDH)
         self.time_gallery_window.show_gallery()
         print(self.PDH.get_today_conversations())
+
+    def close_ani(self):
+        pass
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
