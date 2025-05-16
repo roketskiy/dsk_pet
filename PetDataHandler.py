@@ -337,3 +337,23 @@ class PetDataHandler:
         except sqlite3.Error as e:
             print(f"获取CET6单词失败: {str(e)}")
             return []
+
+    def get_graduate_words(self, limit=None):
+        """从graduate表获取单词
+
+        参数:
+            limit: (可选) 限制返回的单词数量
+
+        返回:
+            包含(word, translate)元组的列表
+        """
+        try:
+            cursor = self.conn.cursor()
+            query = "SELECT word, translate FROM graduate"
+            if limit:
+                query += f" LIMIT {int(limit)}"
+            cursor.execute(query)
+            return cursor.fetchall()
+        except sqlite3.Error as e:
+            print(f"获取考研单词失败: {str(e)}")
+            return []

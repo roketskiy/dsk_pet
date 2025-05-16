@@ -111,10 +111,15 @@ class WordTypingGame(QWidget):
         self.cet6_radio.setStyleSheet("font-size: 15px; color: #333;font-family: 'Microsoft YaHei';")
         self.cet6_radio.toggled.connect(self.on_word_source_changed)
 
+        self.graduate_radio = QRadioButton("考研词汇")
+        self.graduate_radio.setStyleSheet("font-size: 15px; color: #333;font-family: 'Microsoft YaHei';")
+        self.graduate_radio.toggled.connect(self.on_word_source_changed)
+
 
         word_source_layout.addWidget(self.cet_label)
         word_source_layout.addWidget(self.cet4_radio)
         word_source_layout.addWidget(self.cet6_radio)
+        word_source_layout.addWidget(self.graduate_radio)
         word_source_layout.addStretch()
 
         # 游戏区域
@@ -253,7 +258,7 @@ class WordTypingGame(QWidget):
 
             if self.current_index >= len(self.current_word):
                 self.score += 1
-                self.score_label.setText(f"得分: {self.score}")
+                self.score_label.setText(f"已输入单词: {self.score}")
                 QTimer.singleShot(100, self.next_word)
         else:
             # 错误处理部分
@@ -292,8 +297,10 @@ class WordTypingGame(QWidget):
         """当词库选择改变时重新加载单词"""
         if self.cet4_radio.isChecked():
             self.word_source = "CET4"
-        else:
+        elif self.cet6_radio.isChecked():
             self.word_source = "CET6"
+        elif self.graduate_radio.isChecked():
+            self.word_source = "graduate"
         self.load_words_from_db()
 
     def closeEvent(self, event):

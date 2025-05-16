@@ -85,5 +85,13 @@ class PetDatabase:
                     translate TEXT NOT NULL
                 )
                 """)
+        #graduate表
+        cursor.execute("""
+                        CREATE TABLE IF NOT EXISTS graduate(
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            word TEXT NOT NULL,
+                            translate TEXT NOT NULL
+                        )
+                        """)
 
         self.conn.commit()
