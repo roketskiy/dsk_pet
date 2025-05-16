@@ -36,14 +36,17 @@ class RPGGame(QWidget):
         self.scissors_128_img = 'img/猜拳石头剪刀布剪刀128.png'
         self.paper_128_img = 'img/猜拳石头剪刀布 布128.png'
         self.default_img = 'img/game_question.png'
-        self.win_img = 'img/game_win.png'
+        self.win_img = 'img/胜利.png'
+        self.lose_img = 'img/负.png'
+        self.pingju_img= 'img/平局.png'
 
         self.rock_pixmap = QPixmap(self.rock_128_img).scaled(128, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.scissors_pixmap = QPixmap(self.scissors_128_img).scaled(128, 128, Qt.KeepAspectRatio,
                                                                      Qt.SmoothTransformation)
         self.paper_pixmap = QPixmap(self.paper_128_img).scaled(128, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.win_pixmap = QPixmap(self.win_img).scaled(128, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-
+        self.lose_pixmap = QPixmap(self.lose_img).scaled(128, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        self.pingju_pixmap = QPixmap(self.pingju_img).scaled(128, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.init_UI()
 
     def init_UI(self):
@@ -152,7 +155,7 @@ class RPGGame(QWidget):
                                                 font-size: 16px;
                                                 font-weight: bold;
                                                 qproperty-alignment: 'AlignCenter';  /* 水平和垂直居中 */
-                                                border:1px solid black;
+                                                
                                                 }
 
 
@@ -166,20 +169,20 @@ class RPGGame(QWidget):
                                         color: black;
                                         font-size: 16px;
                                         font-weight: bold;
-                                        border:1px solid black;
+                                        
                                         }
 
                             """)
 
         computer_label = QLabel()
-        computer_label.setText("电脑")
+        computer_label.setText("小忆")
         computer_label.setStyleSheet("""
                                                     QLabel {
                                                         background: white;
                                                         color: black;
                                                         font-size: 16px;
                                                         font-weight: bold;
-                                                        border:1px solid black;
+                                                        
                                                         qproperty-alignment: 'AlignCenter';  /* 水平和垂直居中 */
                                                         }
 
@@ -382,11 +385,18 @@ class RPGGame(QWidget):
         if message == "你输了！":
             self.computer_label.setPixmap(
                 self.win_pixmap)
+            self.player_label.setPixmap(
+                self.lose_pixmap)
         elif message == "你赢了！":
             self.player_label.setPixmap(
                 self.win_pixmap)
+            self.computer_label.setPixmap(
+                self.lose_pixmap)
         else:
-            pass
+            self.player_label.setPixmap(
+                self.pingju_pixmap)
+            self.computer_label.setPixmap(
+                self.pingju_pixmap)
 
     def game_close(self):
         self.PDH.log_game_score(self.score_this)

@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea,
                              QPushButton, QApplication, QGraphicsDropShadowEffect)
-from PyQt5.QtCore import Qt, QPropertyAnimation, QEasingCurve, QRect
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QColor
 
 

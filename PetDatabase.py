@@ -69,5 +69,21 @@ class PetDatabase:
             FOREIGN KEY (user_id) REFERENCES users(user_id)
         )
         """)
+        # CET4表
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS CET4 (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            word TEXT NOT NULL,
+            translate TEXT NOT NULL
+        )
+        """)
+        # CET6表
+        cursor.execute("""
+                CREATE TABLE IF NOT EXISTS CET6 (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    word TEXT NOT NULL,
+                    translate TEXT NOT NULL
+                )
+                """)
 
         self.conn.commit()

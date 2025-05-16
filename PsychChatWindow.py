@@ -376,7 +376,7 @@ class PsychChatWindow(QWidget):
         avatar.setFixedSize(36, 36)
         if role == "assistant":
             avatar.setPixmap(
-                QPixmap('img/assistant_avatar.png').scaled(36, 36, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+                QPixmap('img/cat_assistance.png').scaled(36, 36, Qt.KeepAspectRatio, Qt.SmoothTransformation))
             layout.addWidget(avatar, 0, Qt.AlignTop)
         else:
             layout.addStretch()
@@ -405,7 +405,7 @@ class PsychChatWindow(QWidget):
         if role == "user":
             user_avatar = QLabel()
             user_avatar.setPixmap(
-                QPixmap('img/user_avatar.png').scaled(36, 36, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+                QPixmap('img/cat_user.png').scaled(36, 36, Qt.KeepAspectRatio, Qt.SmoothTransformation))
             layout.addWidget(user_avatar, 0, Qt.AlignTop)
 
         self.chat_layout.insertWidget(0, message_widget)

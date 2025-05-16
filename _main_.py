@@ -9,6 +9,7 @@ from PsychChatWindow import PsychChatWindow
 from TimeGalleryWindow import TimeGalleryWindow
 from WeatherWindow import WeatherWindow
 import global_value
+from WordTypingGame import WordTypingGame
 
 
 # ==================== 桌宠主程序 ====================
@@ -157,7 +158,6 @@ class DesktopPet(QWidget):
                     max-width: 200px;  /* 限制最大宽度 */
                 }
             """)
-        print(self.bubble.styleSheet())
         self.bubble.hide()
         self.bubble_duration = 3000  # 气泡显示3秒
 
@@ -202,6 +202,7 @@ class DesktopPet(QWidget):
         self.menu = QMenu(self)
         self.menu.setWindowFlags(Qt.FramelessWindowHint | Qt.Popup)
         self.menu.setAttribute(Qt.WA_TranslucentBackground)
+        self.menu.setContentsMargins(10,10,10,10)
         self.menu.setStyleSheet("""
             QMenu {
                 background-color: white;  /* 背景颜色为白色 */
@@ -244,6 +245,7 @@ class DesktopPet(QWidget):
         self.game_menu=QMenu(self)
         self.game_menu.setWindowFlags(Qt.FramelessWindowHint | Qt.Popup)
         self.game_menu.setAttribute(Qt.WA_TranslucentBackground)
+        self.game_menu.setContentsMargins(10,10,10,10)
         self.game_menu.setStyleSheet("""
                     QMenu {
                         background-color: white;  /* 背景颜色为白色 */
@@ -275,6 +277,10 @@ class DesktopPet(QWidget):
         self.RPG_Game=QAction('猜拳',self)
         self.RPG_Game.triggered.connect(self.show_RPG_Game)
         self.game_menu.addAction(self.RPG_Game)
+        self.game_menu.addSeparator()
+        self.word_game_action = QAction('单词打字', self)
+        self.word_game_action.triggered.connect(self.show_word_game)
+        self.game_menu.addAction(self.word_game_action)
         self.game_action.setMenu(self.game_menu)
         self.menu.addAction(self.game_action)
         self.menu.addSeparator()
@@ -444,6 +450,12 @@ class DesktopPet(QWidget):
 
     def close_ani(self):
         pass
+
+    def show_word_game(self):
+        if hasattr(self, 'word_game_window'):
+            self.word_game_window.close()
+        self.word_game_window = WordTypingGame(self.PDH)
+        self.word_game_window.show_game()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

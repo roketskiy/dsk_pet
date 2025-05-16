@@ -111,6 +111,7 @@ class WeatherWindow(QWidget):
                             font-family: 'Microsoft YaHei';
                             font-weight: bold;
                         """)
+        mid_body.setContentsMargins(10,10,10,10)
         layout= QVBoxLayout(mid_body)
         layout.setContentsMargins(10, 10, 10, 10)
 
