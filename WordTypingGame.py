@@ -16,7 +16,9 @@ class WordTypingGame(QWidget):
         self.current_index = 0
         self.word_dict = {}
         self.word_source = "CET4"  # 默认使用CET4词汇表
+        self.right_count = 0
         self.error_count = 0
+        self.right_rate=None
         self.error_timer = None
         self.init_ui()
         self.load_words_from_db()
@@ -141,11 +143,17 @@ class WordTypingGame(QWidget):
         self.score_label.setAlignment(Qt.AlignCenter)
         self.score_label.setStyleSheet("font-size: 15px; color: #333;font-family: 'Microsoft YaHei';")
 
+        self.right_rate_label = QLabel(f"正确率: {self.right_rate}%")
+        self.right_rate_label.setAlignment(Qt.AlignCenter)
+        self.right_rate_label.setStyleSheet("font-size: 15px; color: #333;font-family: 'Microsoft YaHei';")
+
         self.error_label = QLabel(f"错误数: {self.error_count}")
         self.error_label.setAlignment(Qt.AlignCenter)
         self.error_label.setStyleSheet("font-size: 15px; color: #333;font-family: 'Microsoft YaHei';")
 
         count_layout.addWidget(self.score_label)
+        count_layout.addStretch()
+        count_layout.addWidget(self.right_rate_label)
         count_layout.addStretch()
         count_layout.addWidget(self.error_label)
 
@@ -224,6 +232,7 @@ class WordTypingGame(QWidget):
             if i < self.current_index:
                 # 已输入正确的字母 - 黑色
                 word_html += f'<span style="color:rgb(101, 124, 106);">{char}</span>'
+
             else:
                 # 待输入的字母 - 灰色
                 word_html += f'<span style="color:#ccc;">{char}</span>'
@@ -236,7 +245,9 @@ class WordTypingGame(QWidget):
 
         key = event.text().lower()
 
+
         if key == self.current_word[self.current_index].lower():
+            self.right_count += 1
             self.current_index += 1
             self.display_word()
 
@@ -268,7 +279,9 @@ class WordTypingGame(QWidget):
             if self.error_timer:
                 self.error_timer.stop()
             self.error_timer = QTimer.singleShot(100, lambda: self.word_label.setText(original_html))
-
+        self.right_rate = self.right_count / max(1, self.right_count + self.error_count)
+        self.right_rate_label.setText(f"正确率: {self.right_rate:.3%}")
+        print(self.right_rate, self.right_count, self.error_count)
     def show_game(self):
         """显示游戏窗口"""
         self.show()
