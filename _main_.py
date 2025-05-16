@@ -284,7 +284,7 @@ class DesktopPet(QWidget):
         self.game_action.setMenu(self.game_menu)
         self.menu.addAction(self.game_action)
         self.menu.addSeparator()
-        self.time_gallery_action = QAction("时间长廊", self)
+        self.time_gallery_action = QAction("回忆卡片", self)
         self.time_gallery_action.triggered.connect(self.show_time_gallery)
         self.menu.addAction(self.time_gallery_action)
         self.menu.addSeparator()

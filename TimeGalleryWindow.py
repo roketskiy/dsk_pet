@@ -13,7 +13,7 @@ class TimeGalleryWindow(QWidget):
         self.parent = parent
         self.PDH = PDH
 
-        self.setWindowTitle("时间长廊")
+        self.setWindowTitle("回忆卡片")
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setFixedSize(800, 600)
@@ -54,7 +54,7 @@ class TimeGalleryWindow(QWidget):
         title_icon.setPixmap(QPixmap('img/time_icon.png').scaled(36, 36, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         title_icon.setStyleSheet("background: transparent;")
 
-        title_text = QLabel("时间长廊")
+        title_text = QLabel("回忆卡片")
         title_text.setStyleSheet("""
             QLabel {
                 background: transparent;
