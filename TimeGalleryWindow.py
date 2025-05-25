@@ -41,7 +41,7 @@ class TimeGalleryWindow(QWidget):
         title_bar = QWidget()
         title_bar.setFixedHeight(50)
         title_bar.setStyleSheet("""
-            background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #ADD8E6, stop:1 #FFFFFF);
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 rgb(111, 230, 252), stop:1 #FFFFFF);
             border-top-left-radius: 15px;
             border-top-right-radius: 15px;
             padding-left: 15px;
@@ -51,7 +51,7 @@ class TimeGalleryWindow(QWidget):
         title_layout.setContentsMargins(0, 0, 10, 0)
 
         title_icon = QLabel()
-        title_icon.setPixmap(QPixmap('img/time_icon.png').scaled(36, 36, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        title_icon.setPixmap(QPixmap('img/card.png').scaled(36, 36, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         title_icon.setStyleSheet("background: transparent;")
 
         title_text = QLabel("回忆卡片")
@@ -60,7 +60,7 @@ class TimeGalleryWindow(QWidget):
                 background: transparent;
                 color: black;
                 font-size: 16px;
-                font-weight: bold;
+                font-weight: 350;
                 padding-left: 10px;
                 font-family: 'Microsoft YaHei';
             }
@@ -257,7 +257,7 @@ class TimeGalleryWindow(QWidget):
         weather_label.setStyleSheet("font-size: 14px; color: #555;"
                                     "font-family: 'Microsoft YaHei';"
                                     "background: transparent;"
-                                    )
+        )
 
         weather_layout.addWidget(weather_icon)
         weather_layout.addWidget(weather_label)
@@ -301,6 +301,7 @@ class TimeGalleryWindow(QWidget):
                 font-size: 14px; 
                 color: #333;
                 font-family: 'Microsoft YaHei';
+                font-weight: 350;  
                 padding: 8px;
             }
         """)

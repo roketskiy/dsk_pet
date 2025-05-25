@@ -357,3 +357,22 @@ class PetDataHandler:
         except sqlite3.Error as e:
             print(f"获取考研单词失败: {str(e)}")
             return []
+
+    def get_daily_conversations(self, username="default"):
+        """获取当天所有用户对话"""
+        try:
+            today = datetime.date.today()
+            cursor = self.conn.cursor()
+            cursor.execute("""
+                SELECT cl.content 
+                FROM chat_logs cl
+                JOIN sessions s ON cl.session_id = s.session_id
+                JOIN users u ON s.user_id = u.user_id
+                WHERE date(cl.timestamp) = date(?)
+                AND u.username = ?
+                AND cl.role = 'user'
+            """, (today, username))
+            return [msg[0] for msg in cursor.fetchall()]
+        except sqlite3.Error as e:
+            print(f"获取对话失败: {str(e)}")
+            return []

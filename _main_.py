@@ -1,14 +1,16 @@
 import sys
 import random
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QMovie, QPixmap
-from PyQt5.QtWidgets import (QApplication, QWidget, QLabel,QMenu, QAction)
+from PyQt5.QtGui import QMovie, QPixmap, QColor
+from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QMenu, QAction, QGraphicsDropShadowEffect)
 from PetDataHandler import PetDataHandler
 from Pet_Game_1 import RPGGame
 from PsychChatWindow import PsychChatWindow
 from TimeGalleryWindow import TimeGalleryWindow
 from WeatherWindow import WeatherWindow
 import global_value
+from emotion_analysis import EmotionAnalysisWindow
+
 from WordTypingGame import WordTypingGame
 
 
@@ -205,32 +207,36 @@ class DesktopPet(QWidget):
         self.menu.setContentsMargins(10,10,10,10)
         self.menu.setStyleSheet("""
             QMenu {
-                background-color: white;  /* 背景颜色为白色 */
-                color:black;  /* 字体颜色为白色 */
-                border-radius: 8px;  /* 圆角 */
-                border: 1px solid black;  /* 边框 */
+                background-color: white;  
+                color:black;  
+                border-radius: 8px;  
+                border: 1px solid black;
                 padding: 0;
             }
             QMenu::item {
                 background-color: transparent;
                 border-radius: 5px;
                 height: 30px;
-                padding-left: 20px;  /* 左边距 */
-                padding-right: 20px;  /* 右边距 */
-                text-align: center;  /* 文本居中 */
-                font-size: 14px;  /* 字体大小 */
-                font-weight: 500;  /* 字体加粗 */
-                font-family: "Microsoft YaHei";  /* 字体 */
+                padding-left: 20px;  
+                padding-right: 20px;  
+                text-align: center;  
+                font-size: 14px;  
+                font-weight: 350;  
+                font-family: "Microsoft YaHei";  
             }
             QMenu::item:selected {
-                background-color: rgb(173,216,230);  /* 选中项的背景色 */
-                border-radius: 5px;  /* 选中项圆角 */
+                background-color: rgb(168, 241, 255);  
+                border-radius: 5px;  
             }
             QMenu::item:disabled {
-                color: #888;  /* 禁用项的字体颜色 */
-                background-color: transparent;  /* 禁用项的背景色 */
+                color: #888;  
+                background-color: transparent; 
             }
         """)
+        shadow = QGraphicsDropShadowEffect(self.menu)
+        shadow.setBlurRadius(15)
+        shadow.setColor(QColor(0, 0, 0, 60))
+        shadow.setOffset(3, 3)
         self.menu.update()
         self.menu.addSeparator()
         self.chat_action = QAction("和小忆说说话", self)
@@ -248,30 +254,30 @@ class DesktopPet(QWidget):
         self.game_menu.setContentsMargins(10,10,10,10)
         self.game_menu.setStyleSheet("""
                     QMenu {
-                        background-color: white;  /* 背景颜色为白色 */
-                        color:black;  /* 字体颜色为白色 */
-                        border-radius: 8px;  /* 圆角 */
-                        border: 1px solid black;  /* 边框 */
+                        background-color: white;  
+                        color:black; 
+                        border-radius: 8px; 
+                        border: 1px solid black;  
                         padding: 0;
                     }
                     QMenu::item {
                         background-color: transparent;
                         border-radius: 5px;
                         height: 30px;
-                        padding-left: 20px;  /* 左边距 */
-                        padding-right: 20px;  /* 右边距 */
-                        text-align: center;  /* 文本居中 */
-                        font-size: 14px;  /* 字体大小 */
-                        font-weight: 500;  /* 字体加粗 */
-                        font-family: "Microsoft YaHei";  /* 字体 */
+                        padding-left: 20px; 
+                        padding-right: 20px;  
+                        text-align: center;  
+                        font-size: 14px;  
+                        font-weight: 350;  
+                        font-family: "Microsoft YaHei"; 
                     }
                     QMenu::item:selected {
-                        background-color: rgb(173,216,230);  /* 选中项的背景色 */
-                        border-radius: 5px;  /* 选中项圆角 */
+                        background-color: rgb(168, 241, 255);  
+                        border-radius: 5px;  
                     }
                     QMenu::item:disabled {
-                        color: #888;  /* 禁用项的字体颜色 */
-                        background-color: transparent;  /* 禁用项的背景色 */
+                        color: #888;  
+                        background-color: transparent; 
                     }
                 """)
         self.RPG_Game=QAction('猜拳',self)
@@ -288,10 +294,16 @@ class DesktopPet(QWidget):
         self.time_gallery_action.triggered.connect(self.show_time_gallery)
         self.menu.addAction(self.time_gallery_action)
         self.menu.addSeparator()
+        self.emotion_analysis_action = QAction("情绪分析", self)
+        self.emotion_analysis_action.triggered.connect(self.show_emotion_analysis)
+        self.menu.addAction(self.emotion_analysis_action)
+        self.menu.addSeparator()
         self.exit_action = QAction("退出", self)
         self.exit_action.triggered.connect(self.close)
         self.menu.addAction(self.exit_action)
         self.menu.addSeparator()
+
+
         self.update_weather_icon()
         self.init_animation()
 
@@ -312,7 +324,7 @@ class DesktopPet(QWidget):
             self.weather_window.close()
         if self.RPG_game_window:
             self.RPG_game_window.close()
-        self.PDH.log_mood_card(global_value.CURRENT_WEATHER,'好',random.choice([1,2,3,4,5]), "default")
+
         self.PDH.end_session()
         event.accept()
 
@@ -435,7 +447,6 @@ class DesktopPet(QWidget):
 
     def speak_randomly(self):
         """随机发言"""
-         # 假设宠物有获取天气的方法
         weather_type = self.weather_mapping.get(global_value.CURRENT_WEATHER, "default")
 
         responses = self.weather_responses.get(weather_type, []) + self.weather_responses["default"]
@@ -456,6 +467,12 @@ class DesktopPet(QWidget):
             self.word_game_window.close()
         self.word_game_window = WordTypingGame(self.PDH)
         self.word_game_window.show_game()
+
+    def show_emotion_analysis(self):
+        """显示情绪分析窗口"""
+        if not hasattr(self, 'emotion_window'):
+            self.emotion_window = EmotionAnalysisWindow(self, self.PDH)
+        self.emotion_window.show_analysis()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

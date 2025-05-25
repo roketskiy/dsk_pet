@@ -18,7 +18,7 @@ class WeatherWindow(QWidget):
         self.main_container.setObjectName("mainContainer")
         self.main_container.setStyleSheet("""
                             #mainContainer {
-                                background: transparent;
+                                background: rgba(255, 255, 255, 0.95);
                                 border-radius: 15px;
                                 border: 1px solid #e0e0e0;
                             }
@@ -51,7 +51,7 @@ class WeatherWindow(QWidget):
         title_bar.setFixedHeight(50)
         # 设置标题栏的样式表，包括背景色、圆角和内边距
         title_bar.setStyleSheet("""
-                            background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #ADD8E6, stop:1 #FFFFFF);
+                            background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 rgb(111, 230, 252), stop:1 #FFFFFF);
                             border-top-left-radius: 15px;
                             border-top-right-radius: 15px;
                             padding-left: 15px;
@@ -77,7 +77,7 @@ class WeatherWindow(QWidget):
                                 background: transparent;
                                 color: black;
                                 font-size: 16px;
-                                font-weight: bold;
+                                font-weight: 350;  
                                 padding-left: 10px;
                                 font-family: 'Microsoft YaHei';
                             }
@@ -109,7 +109,7 @@ class WeatherWindow(QWidget):
                             border-bottom-left-radius: 15px;
                             border-bottom-right-radius: 15px;
                             font-family: 'Microsoft YaHei';
-                            font-weight: bold;
+                            font-weight: 350;  
                         """)
         mid_body.setContentsMargins(10,10,10,10)
         layout= QVBoxLayout(mid_body)
@@ -266,6 +266,7 @@ class WeatherWindow(QWidget):
 
     def weather_show(self):
         self.adjust_position()
+
         super().show()
     def weather_close(self):
         self.hide()

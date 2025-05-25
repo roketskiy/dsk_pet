@@ -1,3 +1,5 @@
+
+
 from PyQt5.QtCore import Qt, QSize, QTimer
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QHBoxLayout, QLabel, QMessageBox
@@ -47,6 +49,7 @@ class RPGGame(QWidget):
         self.win_pixmap = QPixmap(self.win_img).scaled(128, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.lose_pixmap = QPixmap(self.lose_img).scaled(128, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.pingju_pixmap = QPixmap(self.pingju_img).scaled(128, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        self.default_pixmap = QPixmap(self.default_img).scaled(128, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.init_UI()
 
     def init_UI(self):
@@ -59,7 +62,7 @@ class RPGGame(QWidget):
         title_bar.setFixedHeight(50)
         # 设置标题栏的样式表，包括背景色、圆角和内边距
         title_bar.setStyleSheet("""
-                                    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #ADD8E6, stop:1 #FFFFFF);
+                                    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 rgb(111, 230, 252), stop:1 #FFFFFF);
                                     border-top-left-radius: 15px;
                                     border-top-right-radius: 15px;
                                     padding-left: 15px;
@@ -84,7 +87,7 @@ class RPGGame(QWidget):
                                         background: transparent;
                                         color: black;
                                         font-size: 16px;
-                                        font-weight: bold;
+                                        font-weight: 350;
                                         padding-left: 10px;
                                         font-family: 'Microsoft YaHei';
                                     }
@@ -311,57 +314,20 @@ class RPGGame(QWidget):
             if btn.text() not in ["关闭"]:  # 保留关闭按钮可用
                 btn.setEnabled(False)
 
-        # 电脑随机选择
         choices = ["rock", "scissors", "paper"]
         self.computer_choice = random.choice(choices)
-
-        # 显示电脑的选择（可以添加动画效果）
-        self.animate_computer_choice()
-
-    def animate_computer_choice(self):
-        """动画显示电脑的选择过程"""
-        choices = ["rock", "scissors", "paper"]
-        self.animation_counter = 0
-        self.animation_timer = QTimer(self)
-        self.animation_timer.timeout.connect(self.update_computer_animation)
-        self.animation_timer.start(150)  # 每100毫秒更新一次
-
-    def update_computer_animation(self):
-        """更新电脑选择的动画"""
-        choices = ["rock", "scissors", "paper"]
-        if self.animation_counter < 10:  # 动画持续1秒（10次*100毫秒）
-            # 随机显示一个选择作为动画效果
-            temp_choice = random.choice(choices)
-            if temp_choice == "rock":
-                self.computer_label.setPixmap(
-                    self.rock_pixmap)
-            elif temp_choice == "scissors":
-                self.computer_label.setPixmap(
-                    self.scissors_pixmap)
-            else:
-                self.computer_label.setPixmap(
-                    self.paper_pixmap)
-            self.animation_counter += 1
+        if self.computer_choice == "rock":
+            self.computer_label.setPixmap(
+                self.rock_pixmap)
+        elif self.computer_choice == "scissors":
+            self.computer_label.setPixmap(
+                self.scissors_pixmap)
         else:
-            # 动画结束，显示电脑的真实选择
-            self.animation_timer.stop()
-            if self.computer_choice == "rock":
-                self.computer_label.setPixmap(
-                    self.rock_pixmap)
-            elif self.computer_choice == "scissors":
-                self.computer_label.setPixmap(
-                    self.scissors_pixmap)
-            else:
-                self.computer_label.setPixmap(
-                    self.paper_pixmap)
+            self.computer_label.setPixmap(
+                self.paper_pixmap)
+        QTimer.singleShot(1000, self.determine_winner)
 
-            # 判断胜负
-            self.determine_winner()
 
-            # 重新启用按钮
-            for btn in self.findChildren(QPushButton):
-                if btn.text() not in ["关闭"]:
-                    btn.setEnabled(True)
 
     def determine_winner(self):
         """判断胜负并更新积分"""
@@ -398,10 +364,23 @@ class RPGGame(QWidget):
             self.computer_label.setPixmap(
                 self.pingju_pixmap)
 
+        QTimer.singleShot(1000, self.reset_game)
+
+    def reset_game(self):
+        """重置游戏状态"""
+        self.player_label.setPixmap(self.default_pixmap)
+        self.computer_label.setPixmap(self.default_pixmap)
+
+        # 重新启用按钮
+        for btn in self.findChildren(QPushButton):
+            if btn.text() not in ["关闭"]:
+                btn.setEnabled(True)
+
     def game_close(self):
         self.PDH.log_game_score(self.score_this)
         self.score_this = 0
         self.score_label.setText("积分: 0")
+
         self.close()
 
 

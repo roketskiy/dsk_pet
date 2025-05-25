@@ -93,7 +93,7 @@ class PsychChatWindow(QWidget):
         self.main_container.setObjectName("mainContainer")
         self.main_container.setStyleSheet("""
                     #mainContainer {
-                        background: #ffffff;
+                        background: rgba(255, 255, 255, 0.95);
                         border-radius: 15px;
                         border: 1px solid #e0e0e0;
                     }
@@ -193,7 +193,7 @@ class PsychChatWindow(QWidget):
         title_bar = QWidget()
         title_bar.setFixedHeight(50)
         title_bar.setStyleSheet("""
-                    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #ADD8E6, stop:1 #FFFFFF);
+                    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 rgb(111, 230, 252), stop:1 #FFFFFF);
                     border-top-left-radius: 15px;
                     border-top-right-radius: 15px;
                     padding-left: 15px;
@@ -217,7 +217,7 @@ class PsychChatWindow(QWidget):
                         background: transparent;
                         color: black;
                         font-size: 16px;
-                        font-weight: bold;
+                        font-weight: 350;  
                         padding-left: 10px;
                         font-family: 'Microsoft YaHei';
                     }

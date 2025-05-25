@@ -50,7 +50,7 @@ class WordTypingGame(QWidget):
         title_layout = QHBoxLayout(title_bar)
         title_bar.setStyleSheet(
             """
-            background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #ADD8E6, stop:1 #FFFFFF);
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 rgb(111, 230, 252), stop:1 #FFFFFF);
             border-top-left-radius: 15px;
             border-top-right-radius: 15px;
             padding-left: 15px;
@@ -66,7 +66,7 @@ class WordTypingGame(QWidget):
                 background: transparent;
                 color: black;
                 font-size: 16px;
-                font-weight: bold;
+                font-weight: 400;  
                 padding-left: 10px;
                 font-family: 'Microsoft YaHei';
             }
@@ -131,7 +131,7 @@ class WordTypingGame(QWidget):
         self.meaning_label.setAlignment(Qt.AlignCenter)
         self.meaning_label.setStyleSheet("""
             QLabel {
-                font-size: 20px;
+                font-size: 18px;
                 color: #666;
                 font-family: 'Microsoft YaHei';
             }
@@ -286,7 +286,9 @@ class WordTypingGame(QWidget):
             self.error_timer = QTimer.singleShot(100, lambda: self.word_label.setText(original_html))
         self.right_rate = self.right_count / max(1, self.right_count + self.error_count)
         self.right_rate_label.setText(f"正确率: {self.right_rate:.3%}")
-        print(self.right_rate, self.right_count, self.error_count)
+
+
+
     def show_game(self):
         """显示游戏窗口"""
         self.show()
@@ -305,5 +307,4 @@ class WordTypingGame(QWidget):
 
     def closeEvent(self, event):
         """关闭时保存分数"""
-
         event.accept()
