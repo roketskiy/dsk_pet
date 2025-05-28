@@ -145,7 +145,7 @@ class DesktopPet(QWidget):
 
         self.bubble_timer= QTimer(self)
         self.bubble_timer.timeout.connect(self.show_random_bubble)
-        self.bubble_timer.start(60000)
+        self.bubble_timer.start(15000)
         self.bubble_message=None
         self.bubble = QLabel(None)
         self.bubble.setWindowFlags(Qt.ToolTip | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
@@ -181,12 +181,6 @@ class DesktopPet(QWidget):
         self.weather_label.setAttribute(Qt.WA_TranslucentBackground)
         self.weather_label.setStyleSheet("border: none;")
 
-
-
-
-        self.action_timer = QTimer(self)
-        self.action_timer.timeout.connect(self.random_action)
-        self.action_timer.start(60000)
 
         self.click_timer = QTimer()
         self.click_timer.setSingleShot(True)
@@ -312,7 +306,7 @@ class DesktopPet(QWidget):
     def init_ui(self):
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setGeometry(1200, 800, 200, 200)
+        self.setGeometry(1200, 200, 200, 200)
 
 
 
@@ -346,17 +340,31 @@ class DesktopPet(QWidget):
         self.appear_animation()
 
     def appear_animation(self):
-        self.play_animation(self.animations['box'])
-        self.stand_action()
+        self.play_animation('img/character/box.gif')
+        self.ac_timer = QTimer(self)
+        self.ac_timer.timeout.connect(self.stand_action)
+        self.ac_timer.start(2000)
+
 
     def stand_action(self):
         self.play_animation(self.animations['idle'])
+        self.act_timer= QTimer(self)
+        self.act_timer.timeout.connect(self.random_action)
+        self.act_timer.start(60000)
 
     def random_action(self):
         new_animation = random.choice(list(self.animations.values()))
         if new_animation != self.current_animation:
             self.play_animation(new_animation)
         self.stand_action()
+
+    def sleep_action(self):
+        self.play_animation(self.animations['sleep-1'])
+
+        self.ac_timer = QTimer(self)
+        self.ac_timer.timeout.connect(self.stand_action)
+        self.ac_timer.start(5000)
+
 
     def play_animation(self, gif_path):
         movie = QMovie(gif_path)
@@ -377,10 +385,10 @@ class DesktopPet(QWidget):
 
     def mouseMoveEvent(self, event):
         if event.buttons() == Qt.LeftButton and self.click_start_pos:
-            # 计算移动距离
+
             move_distance = (event.pos() - self.click_start_pos).manhattanLength()
             if move_distance > self.click_threshold or self.is_dragging:
-                # 超过阈值视为拖动
+
                 self.clk_timer.stop()
                 self.is_dragging = True
                 self.move(event.globalPos() - self.drag_start_pos)
@@ -409,12 +417,12 @@ class DesktopPet(QWidget):
         self.chat_window.show()
 
     def update_weather_icon(self):
-        """更新天气图标"""
+
 
         self.weather_label.setPixmap(QPixmap(self.weather_window.get_current_weather_icon()))
 
     def show_weather_window(self):
-        """显示天气详情窗口"""
+
 
 
         self.weather_window.weather_show()
@@ -436,7 +444,7 @@ class DesktopPet(QWidget):
         self.bubble.setText(message)
         self.bubble.adjustSize()
 
-        # 计算气泡位置（在宠物右侧）
+
         pet_pos = self.pos()
         bubble_x = pet_pos.x()  + 45
         bubble_y = pet_pos.y()
@@ -446,7 +454,7 @@ class DesktopPet(QWidget):
         QTimer.singleShot(self.bubble_duration, self.bubble.hide)
 
     def speak_randomly(self):
-        """随机发言"""
+
         weather_type = self.weather_mapping.get(global_value.CURRENT_WEATHER, "default")
 
         responses = self.weather_responses.get(weather_type, []) + self.weather_responses["default"]
@@ -469,7 +477,7 @@ class DesktopPet(QWidget):
         self.word_game_window.show_game()
 
     def show_emotion_analysis(self):
-        """显示情绪分析窗口"""
+
         if not hasattr(self, 'emotion_window'):
             self.emotion_window = EmotionAnalysisWindow(self, self.PDH)
         self.emotion_window.show_analysis()

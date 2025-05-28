@@ -3,7 +3,7 @@ import json
 import global_value
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
                              QPushButton, QApplication)
-from PyQt5.QtCore import Qt, QMargins, pyqtSignal, QThread, QRectF
+from PyQt5.QtCore import Qt, pyqtSignal, QThread
 from PyQt5.QtGui import QPixmap, QPainter, QPen, QColor, QLinearGradient, QFont
 from PyQt5.QtChart import QChart, QChartView, QValueAxis, QAreaSeries, QCategoryAxis, QSplineSeries, QPieSeries, \
     QPieSlice
@@ -22,7 +22,7 @@ class EmotionAnalysisWindow(QWidget):
 
 
         self.init_ui()
-        self.load_history_data()  # 自动加载历史数据
+        self.load_history_data()
 
     def init_ui(self):
         self.main_container = QWidget(self)
@@ -42,7 +42,7 @@ class EmotionAnalysisWindow(QWidget):
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
 
-        # 标题栏
+
         title_bar = QWidget()
         title_bar.setFixedHeight(50)
         title_bar.setStyleSheet("""
@@ -183,13 +183,13 @@ class EmotionAnalysisWindow(QWidget):
         self.result_label.setAlignment(Qt.AlignTop | Qt.AlignLeft)
         result_layout.addWidget(self.result_label)
 
-        # 将组件添加到主布局
+
         main_layout.addWidget(title_bar)
         main_layout.addWidget(button_widget)
         main_layout.addWidget(self.chart_widget)
         main_layout.addWidget(self.result_widget)
 
-        # 窗口拖动功能
+
         self.drag_pos = None
         title_bar.mousePressEvent = self.title_mouse_press
         title_bar.mouseMoveEvent = self.title_mouse_move
@@ -231,7 +231,7 @@ class EmotionAnalysisWindow(QWidget):
                 return
             mood_data.sort(key=lambda x: x[0])  # 按日期升序排序
 
-            # 准备数据
+
             dates = []
             scores = []
             emotion_counts = {
@@ -252,14 +252,14 @@ class EmotionAnalysisWindow(QWidget):
                 else:
                     emotion_counts["消极(0-2分)"] += 1
 
-            # 创建左侧折线图
+
             line_chart = QChart()
             line_chart.setBackgroundBrush(QColor(0, 0, 0, 0))
             line_chart.setTitle("情绪变化趋势")
             line_chart.setTitleFont(QFont("Microsoft YaHei", 10))
             line_chart.legend().hide()
 
-            # 创建折线系列
+
             line_series = QSplineSeries()
             line_series.setName("情绪评分")
             line_series.setColor(QColor(70, 134, 197))
@@ -267,11 +267,11 @@ class EmotionAnalysisWindow(QWidget):
             for i, score in enumerate(scores):
                 line_series.append(i, score)
 
-            # 创建区域系列（用于填充）
+
             area_series = QAreaSeries(line_series)
             area_series.setName("情绪评分")
 
-            # 设置渐变填充
+
             gradient = QLinearGradient()
             gradient.setColorAt(0, QColor(70, 134, 197, 150))
             gradient.setColorAt(1, QColor(70, 134, 197, 50))
@@ -281,12 +281,12 @@ class EmotionAnalysisWindow(QWidget):
             line_chart.addSeries(area_series)
             line_chart.addSeries(line_series)
 
-            # 设置X轴（日期）
+
             axis_x = QCategoryAxis()
             axis_x.setLabelsFont(QFont("Microsoft YaHei", 8))
             axis_x.setTitleText("日期")
 
-            # 只显示部分日期标签，避免重叠
+
             step = max(1, len(dates) // 5)
             for i in range(0, len(dates), step):
                 axis_x.append(dates[i][5:10], i)
@@ -295,7 +295,7 @@ class EmotionAnalysisWindow(QWidget):
             line_chart.addAxis(axis_x, Qt.AlignBottom)
             line_series.attachAxis(axis_x)
 
-            # 设置Y轴（分数）
+
             axis_y = QValueAxis()
             axis_y.setRange(0,6 )
             axis_y.setTickCount(6)
@@ -305,7 +305,7 @@ class EmotionAnalysisWindow(QWidget):
             line_chart.addAxis(axis_y, Qt.AlignLeft)
             line_series.attachAxis(axis_y)
 
-            # 创建右侧饼图
+
             pie_chart = QChart()
             pie_chart.setBackgroundBrush(QColor(0, 0, 0, 0))
             pie_chart.setTitle("情绪分布")
@@ -313,7 +313,7 @@ class EmotionAnalysisWindow(QWidget):
 
             pie_series = QPieSeries()
 
-            # 添加饼图切片
+
             colors = {
                 "积极(4-5分)": QColor(91, 189, 114),
                 "中性(3分)": QColor(247, 186, 30),
@@ -331,7 +331,7 @@ class EmotionAnalysisWindow(QWidget):
 
             pie_chart.addSeries(pie_series)
 
-            # 设置图表视图
+
             self.chart_view.setChart(line_chart)
             self.chart_vview.setChart(pie_chart)
 
